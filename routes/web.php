@@ -48,7 +48,12 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
     Route::post('/loans/{loan}/verify', [AdminDashboardController::class, 'verify'])->name('loans.verify');
     Route::get('/sdgs-report', [AdminDashboardController::class, 'sdgsReport'])->name('sdgs.report');
-    Route::post('/loans/{loan}/verify', [AdminDashboardController::class, 'verify'])->name('loans.verify');
+
+    // Users management
+    Route::get('/users', [AdminDashboardController::class, 'users'])->name('users.index');
+    Route::get('/users/{user}', [AdminDashboardController::class, 'userDetail'])->name('users.show');
+    Route::put('/loans/{loan}', [AdminDashboardController::class, 'updateLoan'])->name('loans.update');
+    Route::delete('/loans/{loan}', [AdminDashboardController::class, 'deleteLoan'])->name('loans.delete');
 });
 
 require __DIR__ . '/auth.php';
