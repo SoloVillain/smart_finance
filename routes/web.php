@@ -6,7 +6,7 @@ use App\Http\Controllers\LoanController;
 use App\Http\Controllers\Admin\AdminDashboardController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Auth; // <--- PASTIKAN BARIS INI ADA
+use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\DashboardController;
 use Inertia\Inertia;
 
@@ -23,19 +23,20 @@ Route::get('/', function () {
 Route::get('/smart-finance', [FinanceController::class, 'index'])->name('finance.index');
 
 // 2. ROUTE YANG MEMERLUKAN LOGIN (AUTH)
-// ... (Bagian atas tetap sama)
-
-// 2. ROUTE YANG MEMERLUKAN LOGIN (AUTH)
 Route::middleware(['auth', 'verified'])->group(function () {
 
     // --- DASHBOARD UTAMA (Pintu Masuk) ---
-    // User dan Admin akan masuk ke sini dulu, lalu dipisah oleh Controller
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     // --- FITUR PINJAMAN USER ---
     Route::prefix('loans')->name('loans.')->group(function () {
         Route::get('/', [LoanController::class, 'index'])->name('index');
+        Route::get('/apply', [LoanController::class, 'create'])->name('create');
         Route::post('/apply', [LoanController::class, 'store'])->name('store');
+        Route::get('/monitoring', [LoanController::class, 'monitoring'])->name('monitoring');
+
+        // Tambahan route untuk update status pembayaran
+        Route::post('/{loan}/pay', [LoanController::class, 'pay'])->name('pay');
     });
 
     // --- MANAJEMEN PROFIL ---

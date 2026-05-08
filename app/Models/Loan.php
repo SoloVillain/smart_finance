@@ -10,6 +10,8 @@ class Loan extends Model
         'tenor',
         'status',
         'skor_kredit',
+        'ktp_path',
+        'payment_status',
     ];
 
     public function user()

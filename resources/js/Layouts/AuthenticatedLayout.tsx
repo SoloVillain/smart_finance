@@ -9,6 +9,7 @@ import {
     ChevronDown,
     Menu,
     X,
+    History,
 } from "lucide-react";
 
 type UserType = {
@@ -35,8 +36,8 @@ export default function AuthenticatedLayout({
 }: AuthenticatedLayoutProps) {
     const { auth } = usePage<PageProps>().props;
     const user = auth.user;
-    const [showingNavigationDropdown, setShowingNavigationDropdown] =
-        useState(false);
+    const isAdmin = user.role === "admin";
+    const [showingNavigationDropdown, setShowingNavigationDropdown] = useState(false);
 
     return (
         <>
@@ -171,8 +172,6 @@ export default function AuthenticatedLayout({
                     white-space: nowrap;
                 }
 
-                .user-chevron { color: #475569; transition: transform 0.2s; }
-
                 .dropdown-menu {
                     position: absolute;
                     top: calc(100% + 8px);
@@ -198,7 +197,7 @@ export default function AuthenticatedLayout({
                     margin-bottom: 6px;
                 }
 
-                .dropdown-user-name {
+                .dropdown-user-info div:first-child {
                     font-family: 'Syne', sans-serif;
                     font-size: 14px;
                     font-weight: 700;
@@ -206,7 +205,7 @@ export default function AuthenticatedLayout({
                     margin-bottom: 2px;
                 }
 
-                .dropdown-user-email {
+                .dropdown-user-info div:last-child {
                     font-size: 12px;
                     color: #475569;
                     overflow: hidden;
@@ -288,18 +287,6 @@ export default function AuthenticatedLayout({
                     margin-bottom: 12px;
                 }
 
-                .mobile-user-details .mobile-user-name {
-                    font-family: 'Syne', sans-serif;
-                    font-size: 15px;
-                    font-weight: 700;
-                    color: white;
-                }
-
-                .mobile-user-details .mobile-user-email {
-                    font-size: 12px;
-                    color: #475569;
-                }
-
                 .mobile-nav-link {
                     display: flex;
                     align-items: center;
@@ -329,9 +316,12 @@ export default function AuthenticatedLayout({
                     background: rgba(15,23,42,0.5);
                     border-bottom: 1px solid rgba(255,255,255,0.04);
                     backdrop-filter: blur(10px);
+                    padding-top: 80px;
                 }
 
                 .auth-main { padding-top: 64px; }
+
+                main { padding-top: 64px; }
 
                 .dropdown-wrapper { position: relative; }
 
@@ -352,7 +342,7 @@ export default function AuthenticatedLayout({
                         </span>
                     </Link>
 
-                    {/* Desktop Nav Links */}
+                    {/* Desktop Nav */}
                     <div className="nav-links">
                         <Link
                             href={route("dashboard")}
@@ -362,7 +352,27 @@ export default function AuthenticatedLayout({
                             Dashboard
                         </Link>
 
-                        {user.role === "admin" && (
+                        {!isAdmin && (
+                            <Link
+                                href={route("loans.create")}
+                                className={`nav-link ${route().current("loans.create") ? "active" : ""}`}
+                            >
+                                <LayoutDashboard size={15} />
+                                Ajukan Pinjaman
+                            </Link>
+                        )}
+
+                        {!isAdmin && (
+                            <Link
+                                href={route("loans.monitoring")}
+                                className={`nav-link ${route().current("loans.monitoring") ? "active" : ""}`}
+                            >
+                                <History size={15} />
+                                Monitoring
+                            </Link>
+                        )}
+
+                        {isAdmin && route().has("admin.users.index") && (
                             <Link
                                 href={route("admin.users.index")}
                                 className={`nav-link ${route().current("admin.users.*") ? "active" : ""}`}
@@ -373,38 +383,24 @@ export default function AuthenticatedLayout({
                         )}
                     </div>
 
+                    {/* Right */}
                     <div className="nav-right">
                         <Dropdown>
                             <Dropdown.Trigger>
-                                <button
-                                    className="user-btn"
-                                    style={{ cursor: "pointer" }}
-                                >
+                                <button className="user-btn">
                                     <div className="user-avatar">
                                         {user.name.charAt(0).toUpperCase()}
                                     </div>
-                                    <span className="user-name">
-                                        {user.name}
-                                    </span>
-                                    <ChevronDown
-                                        size={14}
-                                        className="user-chevron"
-                                    />
+                                    <span className="user-name">{user.name}</span>
+                                    <ChevronDown size={14} color="#475569" />
                                 </button>
                             </Dropdown.Trigger>
 
-                            <Dropdown.Content
-                                align="right"
-                                contentClasses="py-0 bg-transparent"
-                            >
+                            <Dropdown.Content align="right" contentClasses="py-0 bg-transparent">
                                 <div className="dropdown-menu">
                                     <div className="dropdown-user-info">
-                                        <div className="dropdown-user-name">
-                                            {user.name}
-                                        </div>
-                                        <div className="dropdown-user-email">
-                                            {user.email}
-                                        </div>
+                                        <div>{user.name}</div>
+                                        <div>{user.email}</div>
                                     </div>
 
                                     <Dropdown.Link href={route("profile.edit")}>
@@ -416,11 +412,7 @@ export default function AuthenticatedLayout({
 
                                     <div className="dropdown-divider" />
 
-                                    <Dropdown.Link
-                                        href={route("logout")}
-                                        method="post"
-                                        as="button"
-                                    >
+                                    <Dropdown.Link href={route("logout")} method="post" as="button">
                                         <span className="dropdown-item danger">
                                             <LogOut size={14} />
                                             Log Out
@@ -432,15 +424,9 @@ export default function AuthenticatedLayout({
 
                         <button
                             className="mobile-menu-btn"
-                            onClick={() =>
-                                setShowingNavigationDropdown((prev) => !prev)
-                            }
+                            onClick={() => setShowingNavigationDropdown(prev => !prev)}
                         >
-                            {showingNavigationDropdown ? (
-                                <X size={20} />
-                            ) : (
-                                <Menu size={20} />
-                            )}
+                            {showingNavigationDropdown ? <X size={20} /> : <Menu size={20} />}
                         </button>
                     </div>
                 </nav>
@@ -449,75 +435,52 @@ export default function AuthenticatedLayout({
                 {showingNavigationDropdown && (
                     <div className="mobile-menu">
                         <div className="mobile-user-info">
-                            <div
-                                className="user-avatar"
-                                style={{
-                                    width: "40px",
-                                    height: "40px",
-                                    fontSize: "16px",
-                                }}
-                            >
+                            <div className="user-avatar" style={{ width: '40px', height: '40px', fontSize: '16px' }}>
                                 {user.name.charAt(0).toUpperCase()}
                             </div>
-                            <div className="mobile-user-details">
-                                <div className="mobile-user-name">
-                                    {user.name}
-                                </div>
-                                <div className="mobile-user-email">
-                                    {user.email}
-                                </div>
+                            <div>
+                                <div style={{ fontFamily: 'Syne, sans-serif', fontSize: '15px', fontWeight: 700, color: 'white' }}>{user.name}</div>
+                                <div style={{ fontSize: '12px', color: '#475569' }}>{user.email}</div>
                             </div>
                         </div>
 
-                        <Link
-                            href={route("dashboard")}
-                            className={`mobile-nav-link ${route().current("dashboard") ? "active" : ""}`}
-                        >
+                        <Link href={route("dashboard")} className={`mobile-nav-link ${route().current("dashboard") ? "active" : ""}`}>
                             <LayoutDashboard size={16} /> Dashboard
                         </Link>
 
-                        {user.role === "admin" && (
-                            <Link
-                                href={route("admin.users.index")}
-                                className={`mobile-nav-link ${route().current("admin.users.*") ? "active" : ""}`}
-                            >
+                        {!isAdmin && (
+                            <Link href={route("loans.create")} className={`mobile-nav-link ${route().current("loans.create") ? "active" : ""}`}>
+                                <LayoutDashboard size={16} /> Ajukan Pinjaman
+                            </Link>
+                        )}
+
+                        {!isAdmin && (
+                            <Link href={route("loans.monitoring")} className={`mobile-nav-link ${route().current("loans.monitoring") ? "active" : ""}`}>
+                                <History size={16} /> Monitoring
+                            </Link>
+                        )}
+
+                        {isAdmin && (
+                            <Link href={route("admin.users.index")} className="mobile-nav-link">
                                 <Users size={16} /> Users
                             </Link>
                         )}
 
-                        <Link
-                            href={route("profile.edit")}
-                            className="mobile-nav-link"
-                        >
+                        <Link href={route("profile.edit")} className="mobile-nav-link">
                             <User size={16} /> Profile & Settings
                         </Link>
 
-                        <div
-                            style={{
-                                height: "1px",
-                                background: "rgba(255,255,255,0.06)",
-                                margin: "8px 0",
-                            }}
-                        />
+                        <div style={{ height: '1px', background: 'rgba(255,255,255,0.06)', margin: '8px 0' }} />
 
-                        <Link
-                            href={route("logout")}
-                            method="post"
-                            as="button"
-                            className="mobile-nav-link danger"
-                        >
+                        <Link href={route("logout")} method="post" as="button" className="mobile-nav-link danger">
                             <LogOut size={16} /> Log Out
                         </Link>
                     </div>
                 )}
 
-                {header && (
-                    <div className="auth-main">
-                        <div className="auth-header-bar">{header}</div>
-                    </div>
-                )}
+                {header && <div className="auth-header-bar">{header}</div>}
 
-                <main className={header ? "" : "auth-main"}>{children}</main>
+                <main>{children}</main>
             </div>
         </>
     );

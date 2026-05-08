@@ -19,6 +19,8 @@ return new class extends Migration
             $table->decimal('bunga', 5, 2)->default(0);
             $table->integer('skor_kredit')->nullable();
             $table->string('status')->default('pending');
+            $table->string('ktp_path')->nullable();
+            $table->string('payment_status')->default('belum_lunas');
             $table->timestamps();
         });
     }
