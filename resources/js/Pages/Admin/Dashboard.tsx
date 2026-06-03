@@ -2,13 +2,21 @@ import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { router } from "@inertiajs/react";
 import { Head, useForm } from "@inertiajs/react";
 import {
-    ShieldCheck, Clock, TrendingUp,
-    CheckCircle, XCircle, AlertTriangle,
+    ShieldCheck,
+    Clock,
+    TrendingUp,
+    CheckCircle,
+    XCircle,
+    AlertTriangle,
 } from "lucide-react";
 
-type User  = { name: string; email: string };
-type Loan  = { id: number; amount: number; skor_kredit: number; user?: User };
-type Stats = { total_pending?: number; total_aktif?: number; total_sdg_impact?: number };
+type User = { name: string; email: string };
+type Loan = { id: number; amount: number; skor_kredit: number; user?: User };
+type Stats = {
+    total_pending?: number;
+    total_aktif?: number;
+    total_sdg_impact?: number;
+};
 
 type AdminDashboardProps = {
     auth: { user: { name: string; email: string } };
@@ -16,7 +24,11 @@ type AdminDashboardProps = {
     stats: Stats;
 };
 
-export default function Dashboard({ auth, pendingLoans, stats }: AdminDashboardProps) {
+export default function Dashboard({
+    auth,
+    pendingLoans,
+    stats,
+}: AdminDashboardProps) {
     const { processing } = useForm({ action: "" });
 
     const handleVerify = (loanId: number, actionType: string) => {
@@ -304,7 +316,6 @@ export default function Dashboard({ auth, pendingLoans, stats }: AdminDashboardP
 
             <div className="ad-root">
                 <div className="ad-content">
-
                     {/* ── HEADER ── */}
                     <div className="ad-header">
                         <div>
@@ -312,7 +323,8 @@ export default function Dashboard({ auth, pendingLoans, stats }: AdminDashboardP
                                 Admin <em>Dashboard.</em>
                             </div>
                             <div className="ad-subtitle">
-                                Manajemen &amp; verifikasi pengajuan pinjaman mikro SDGs
+                                Manajemen &amp; verifikasi pengajuan pinjaman
+                                mikro SDGs
                             </div>
                         </div>
                         <div className="ad-badge">
@@ -328,10 +340,18 @@ export default function Dashboard({ auth, pendingLoans, stats }: AdminDashboardP
                                 <div className="ad-stat-ico">
                                     <Clock size={17} color="#f0b429" />
                                 </div>
-                                <AlertTriangle size={13} color="#f0b429" style={{ opacity: 0.45 }} />
+                                <AlertTriangle
+                                    size={13}
+                                    color="#f0b429"
+                                    style={{ opacity: 0.45 }}
+                                />
                             </div>
-                            <div className="ad-stat-lbl">Menunggu Verifikasi</div>
-                            <div className="ad-stat-val">{stats?.total_pending || 0}</div>
+                            <div className="ad-stat-lbl">
+                                Menunggu Verifikasi
+                            </div>
+                            <div className="ad-stat-val">
+                                {stats?.total_pending || 0}
+                            </div>
                         </div>
 
                         <div className="ad-stat green">
@@ -341,7 +361,9 @@ export default function Dashboard({ auth, pendingLoans, stats }: AdminDashboardP
                                 </div>
                             </div>
                             <div className="ad-stat-lbl">Pinjaman Aktif</div>
-                            <div className="ad-stat-val">{stats?.total_aktif || 0}</div>
+                            <div className="ad-stat-val">
+                                {stats?.total_aktif || 0}
+                            </div>
                         </div>
 
                         <div className="ad-stat blue">
@@ -350,9 +372,14 @@ export default function Dashboard({ auth, pendingLoans, stats }: AdminDashboardP
                                     <TrendingUp size={17} color="#38bdf8" />
                                 </div>
                             </div>
-                            <div className="ad-stat-lbl">Total Dampak SDG 8</div>
+                            <div className="ad-stat-lbl">
+                                Total Dampak SDG 8
+                            </div>
                             <div className="ad-stat-val sm">
-                                Rp {stats?.total_sdg_impact?.toLocaleString("id-ID") || 0}
+                                Rp{" "}
+                                {Number(stats.total_sdg_impact).toLocaleString(
+                                    "id-ID",
+                                )}
                             </div>
                         </div>
                     </div>
@@ -361,9 +388,12 @@ export default function Dashboard({ auth, pendingLoans, stats }: AdminDashboardP
                     <div className="ad-table-card">
                         <div className="ad-table-head">
                             <div>
-                                <div className="ad-table-head-title">Pengajuan Pinjaman Mikro</div>
+                                <div className="ad-table-head-title">
+                                    Pengajuan Pinjaman Mikro
+                                </div>
                                 <div className="ad-table-head-sub">
-                                    Daftar pengajuan dengan status pending yang membutuhkan verifikasi
+                                    Daftar pengajuan dengan status pending yang
+                                    membutuhkan verifikasi
                                 </div>
                             </div>
                             <div className="ad-pending-pill">
@@ -383,41 +413,80 @@ export default function Dashboard({ auth, pendingLoans, stats }: AdminDashboardP
                                 </thead>
                                 <tbody>
                                     {pendingLoans && pendingLoans.length > 0 ? (
-                                        pendingLoans.map(loan => (
+                                        pendingLoans.map((loan) => (
                                             <tr key={loan.id}>
                                                 <td>
-                                                    <div className="ad-borrower-name">{loan.user?.name || "Unknown"}</div>
-                                                    <div className="ad-borrower-email">{loan.user?.email}</div>
+                                                    <div className="ad-borrower-name">
+                                                        {loan.user?.name ||
+                                                            "Unknown"}
+                                                    </div>
+                                                    <div className="ad-borrower-email">
+                                                        {loan.user?.email}
+                                                    </div>
                                                 </td>
                                                 <td>
                                                     <div className="ad-amount">
-                                                        Rp {loan.amount?.toLocaleString("id-ID")}
+                                                        Rp{" "}
+                                                        {Number(
+                                                            loan.amount,
+                                                        ).toLocaleString(
+                                                            "id-ID",
+                                                        )}
                                                     </div>
                                                 </td>
                                                 <td className="ctr">
-                                                    <span className={`ad-score ${loan.skor_kredit >= 70 ? "good" : "bad"}`}>
-                                                        {loan.skor_kredit >= 70
-                                                            ? <CheckCircle size={11} />
-                                                            : <XCircle size={11} />
-                                                        }
-                                                        {loan.skor_kredit || "N/A"}
+                                                    <span
+                                                        className={`ad-score ${loan.skor_kredit >= 70 ? "good" : "bad"}`}
+                                                    >
+                                                        {loan.skor_kredit >=
+                                                        70 ? (
+                                                            <CheckCircle
+                                                                size={11}
+                                                            />
+                                                        ) : (
+                                                            <XCircle
+                                                                size={11}
+                                                            />
+                                                        )}
+                                                        {loan.skor_kredit ||
+                                                            "N/A"}
                                                     </span>
                                                 </td>
                                                 <td className="ctr">
                                                     <div className="ad-actions">
                                                         <button
                                                             className="ad-btn-approve"
-                                                            disabled={processing}
-                                                            onClick={() => handleVerify(loan.id, "approve")}
+                                                            disabled={
+                                                                processing
+                                                            }
+                                                            onClick={() =>
+                                                                handleVerify(
+                                                                    loan.id,
+                                                                    "approve",
+                                                                )
+                                                            }
                                                         >
-                                                            <CheckCircle size={12} /> Setujui
+                                                            <CheckCircle
+                                                                size={12}
+                                                            />{" "}
+                                                            Setujui
                                                         </button>
                                                         <button
                                                             className="ad-btn-reject"
-                                                            disabled={processing}
-                                                            onClick={() => handleVerify(loan.id, "reject")}
+                                                            disabled={
+                                                                processing
+                                                            }
+                                                            onClick={() =>
+                                                                handleVerify(
+                                                                    loan.id,
+                                                                    "reject",
+                                                                )
+                                                            }
                                                         >
-                                                            <XCircle size={12} /> Tolak
+                                                            <XCircle
+                                                                size={12}
+                                                            />{" "}
+                                                            Tolak
                                                         </button>
                                                     </div>
                                                 </td>
@@ -427,9 +496,13 @@ export default function Dashboard({ auth, pendingLoans, stats }: AdminDashboardP
                                         <tr>
                                             <td colSpan={4}>
                                                 <div className="ad-empty">
-                                                    <ShieldCheck size={36} className="ad-empty-ico" />
+                                                    <ShieldCheck
+                                                        size={36}
+                                                        className="ad-empty-ico"
+                                                    />
                                                     <div className="ad-empty-txt">
-                                                        Tidak ada pengajuan yang menunggu verifikasi
+                                                        Tidak ada pengajuan yang
+                                                        menunggu verifikasi
                                                     </div>
                                                 </div>
                                             </td>
@@ -439,7 +512,6 @@ export default function Dashboard({ auth, pendingLoans, stats }: AdminDashboardP
                             </table>
                         </div>
                     </div>
-
                 </div>
             </div>
         </AuthenticatedLayout>
