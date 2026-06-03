@@ -1,559 +1,326 @@
 import { Head, Link, useForm } from "@inertiajs/react";
-import { User, Mail, Lock, Eye, EyeOff, Sparkles, Globe, ShieldCheck } from "lucide-react";
+import { User, Mail, Lock, Eye, EyeOff, Sparkles, Globe, ShieldCheck, CreditCard, ArrowRight } from "lucide-react";
 import { useState } from "react";
 
 export default function Register() {
     const { data, setData, post, processing, errors, reset } = useForm({
-        name: "",
-        email: "",
-        password: "",
-        password_confirmation: "",
+        name: "", nik: "", email: "", password: "", password_confirmation: "",
     });
-
-    const [showPassword, setShowPassword] = useState(false);
-    const [showConfirm, setShowConfirm] = useState(false);
+    const [showPw, setShowPw] = useState(false);
+    const [showCf, setShowCf] = useState(false);
 
     const submit = (e: React.FormEvent) => {
         e.preventDefault();
-        post(route("register"), {
-            onFinish: () => reset("password", "password_confirmation"),
-        });
+        post(route("register"), { onFinish: () => reset("password", "password_confirmation") });
     };
 
     return (
         <>
-            <Head title="Register - Smart Finance" />
+            <Head title="Daftar — Smart Finance" />
             <style>{`
-                
-                * { box-sizing: border-box; margin: 0; padding: 0; }
+                *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+                html, body {
+                    width: 100%;
+                    /* Biarkan body scroll normal — hanya panel kanan yang fixed */
+                    overflow-x: hidden;
+                    background: #050a14;
+                    -webkit-font-smoothing: antialiased;
+                }
 
-                .reg-root {
+                .rg-root {
                     font-family: 'DM Sans', sans-serif;
-                    background: #020617;
+                    background: linear-gradient(165deg, #050a14 0%, #0a111f 48%, #0f1b2e 100%);
+                    color: #c9d6e3;
                     min-height: 100vh;
                     display: flex;
                     position: relative;
-                    overflow: hidden;
                 }
 
-                .bg-orb {
-                    position: absolute;
-                    border-radius: 50%;
-                    filter: blur(80px);
-                    pointer-events: none;
-                    animation: floatOrb 10s ease-in-out infinite;
-                }
-                .bg-orb-1 { width: 500px; height: 500px; background: rgba(99,102,241,0.12); top: -150px; left: -100px; animation-delay: 0s; }
-                .bg-orb-2 { width: 350px; height: 350px; background: rgba(59,130,246,0.1); bottom: -100px; right: 30%; animation-delay: -5s; }
-                .bg-orb-3 { width: 250px; height: 250px; background: rgba(52,211,153,0.07); top: 40%; right: -50px; animation-delay: -3s; }
-
-                @keyframes floatOrb {
-                    0%, 100% { transform: translate(0, 0); }
-                    50% { transform: translate(20px, -20px); }
+                .rg-root::before {
+                    content: '';
+                    position: fixed; inset: 0;
+                    background: radial-gradient(ellipse 70% 45% at 50% 0%, rgba(77,159,255,0.07) 0%, transparent 55%);
+                    pointer-events: none; z-index: 0;
                 }
 
-                .grid-pattern {
-                    position: absolute;
-                    inset: 0;
-                    background-image:
-                        linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
-                        linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
-                    background-size: 60px 60px;
-                    pointer-events: none;
-                }
-
-                /* Left Panel - Branding */
-                .left-panel {
+                /* ── LEFT PANEL — scroll bebas ── */
+                .rg-left {
                     flex: 1;
-                    display: flex;
-                    flex-direction: column;
-                    justify-content: center;
-                    padding: 60px;
-                    position: relative;
-                    z-index: 10;
+                    display: flex; flex-direction: column; justify-content: center;
+                    padding: 48px 56px;
+                    position: relative; z-index: 1;
+                    border-right: 1px solid rgba(255,255,255,0.06);
+                    /* Kiri bisa scroll jika layar pendek */
+                    overflow-y: auto;
                 }
 
-                .logo-wrap {
-                    display: flex;
-                    align-items: center;
-                    gap: 10px;
-                    margin-bottom: 60px;
-                    text-decoration: none;
+                .rg-logo { display: flex; align-items: center; gap: 10px; margin-bottom: 40px; text-decoration: none; }
+                .rg-logo-mark {
+                    width: 34px; height: 34px; background: #f0b429; border-radius: 8px;
+                    display: flex; align-items: center; justify-content: center;
+                    font-family: 'Syne', sans-serif; font-weight: 800; font-size: 15px;
+                    color: #050a14; line-height: 1; flex-shrink: 0;
                 }
+                .rg-logo-text { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 17px; color: #f0f6fc; letter-spacing: -0.01em; }
+                .rg-logo-text em { color: #f0b429; font-style: normal; }
 
-                .logo-icon {
-                    width: 38px; height: 38px;
-                    background: linear-gradient(135deg, #6366f1, #3b82f6);
-                    border-radius: 10px;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    font-weight: 800;
-                    font-size: 18px;
-                    color: white;
+                .rg-h1 {
                     font-family: 'Syne', sans-serif;
-                    box-shadow: 0 0 20px rgba(99,102,241,0.4);
+                    font-size: clamp(28px, 3vw, 44px); font-weight: 800;
+                    color: #ffffff; letter-spacing: -0.035em; line-height: 1.1;
+                    margin-bottom: 12px;
                 }
+                .rg-h1 .hl  { color: #f0b429; }
+                .rg-h1 .hl2 { color: #38bdf8; }
 
-                .logo-text {
-                    font-family: 'Syne', sans-serif;
-                    font-weight: 700;
-                    font-size: 18px;
-                    color: white;
+                .rg-desc { font-size: 14.5px; font-weight: 400; color: #94a3b8; line-height: 1.7; margin-bottom: 28px; max-width: 380px; }
+
+                .rg-benefits { display: flex; flex-direction: column; gap: 10px; max-width: 380px; margin-bottom: 28px; }
+                .rg-benefit {
+                    display: flex; align-items: flex-start; gap: 12px;
+                    background: rgba(255,255,255,0.03);
+                    border: 1px solid rgba(255,255,255,0.07);
+                    border-radius: 11px; padding: 13px 16px;
+                    transition: border-color 0.2s;
                 }
-                .logo-text span { color: #818cf8; }
-
-                .left-title {
-                    font-family: 'Syne', sans-serif;
-                    font-size: clamp(36px, 4vw, 52px);
-                    font-weight: 800;
-                    color: white;
-                    line-height: 1.1;
-                    margin-bottom: 20px;
-                }
-
-                .left-title .accent {
-                    background: linear-gradient(135deg, #818cf8, #60a5fa, #34d399);
-                    -webkit-background-clip: text;
-                    -webkit-text-fill-color: transparent;
-                    background-clip: text;
-                }
-
-                .left-desc {
-                    font-size: 16px;
-                    color: #64748b;
-                    font-weight: 300;
-                    line-height: 1.7;
-                    margin-bottom: 48px;
-                    max-width: 400px;
-                }
-
-                .benefit-list {
-                    display: flex;
-                    flex-direction: column;
-                    gap: 16px;
-                    max-width: 380px;
-                }
-
-                .benefit-item {
-                    display: flex;
-                    align-items: flex-start;
-                    gap: 14px;
-                    animation: fadeSlideUp 0.5s ease both;
-                }
-
-                .benefit-item:nth-child(1) { animation-delay: 0.1s; }
-                .benefit-item:nth-child(2) { animation-delay: 0.2s; }
-                .benefit-item:nth-child(3) { animation-delay: 0.3s; }
-
-                .benefit-icon {
-                    width: 40px; height: 40px;
-                    border-radius: 10px;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    flex-shrink: 0;
-                    margin-top: 2px;
-                }
-
-                .benefit-title {
-                    font-family: 'Syne', sans-serif;
-                    font-size: 15px;
-                    font-weight: 700;
-                    color: white;
-                    margin-bottom: 3px;
-                }
-
-                .benefit-desc {
-                    font-size: 13px;
-                    color: #475569;
-                    line-height: 1.5;
-                }
-
-                .sdg-bar-wrap { margin-top: 48px; max-width: 380px; }
-
-                .sdg-bar-label {
-                    display: flex;
-                    justify-content: space-between;
-                    font-size: 12px;
-                    color: #475569;
-                    margin-bottom: 6px;
-                }
-
-                .sdg-bar {
-                    height: 4px;
+                .rg-benefit:hover { border-color: rgba(255,255,255,0.12); }
+                .rg-benefit-ico {
+                    width: 34px; height: 34px; border-radius: 8px; flex-shrink: 0;
+                    display: flex; align-items: center; justify-content: center;
                     background: rgba(255,255,255,0.05);
-                    border-radius: 100px;
-                    overflow: hidden;
-                    margin-bottom: 10px;
+                    border: 1px solid rgba(255,255,255,0.08);
+                    margin-top: 1px;
                 }
+                .rg-benefit-title { font-family: 'Syne', sans-serif; font-size: 13.5px; font-weight: 700; color: #f0f6fc; margin-bottom: 2px; }
+                .rg-benefit-desc { font-size: 12px; font-weight: 400; color: #7d8fa8; line-height: 1.5; }
 
-                .sdg-bar-fill {
-                    height: 100%;
-                    border-radius: 100px;
-                    animation: barGrow 1.5s ease both;
-                }
+                .rg-bars { max-width: 380px; }
+                .rg-bar-row { display: flex; justify-content: space-between; font-size: 11.5px; color: #94a3b8; margin-bottom: 4px; }
+                .rg-bar-track { height: 3px; background: rgba(255,255,255,0.06); border-radius: 100px; overflow: hidden; margin-bottom: 10px; }
+                .rg-bar-fill { height: 100%; border-radius: 100px; animation: rgBarFill 1.4s ease both; }
+                @keyframes rgBarFill { from { width: 0%; } }
 
-                @keyframes barGrow {
-                    from { width: 0%; }
-                }
-
-                /* Right Panel - Form */
-                .right-panel {
-                    width: 520px;
+                /* ── RIGHT PANEL — STICKY/FIXED, tidak ikut scroll ── */
+                .rg-right {
+                    width: 480px;
                     flex-shrink: 0;
+                    /* sticky agar tidak scroll bersama konten kiri */
+                    position: sticky;
+                    top: 0;
+                    height: 100vh;
                     display: flex;
                     align-items: center;
                     justify-content: center;
-                    padding: 40px;
-                    position: relative;
-                    z-index: 10;
+                    padding: 24px 44px;
+                    z-index: 1;
+                    overflow: hidden;
                 }
 
-                .form-card {
+                .rg-card {
                     width: 100%;
-                    background: rgba(15,23,42,0.8);
-                    border: 1px solid rgba(255,255,255,0.08);
-                    border-radius: 28px;
-                    padding: 40px;
-                    backdrop-filter: blur(20px);
-                    box-shadow: 0 40px 80px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.08);
-                    animation: fadeSlideUp 0.6s ease both;
+                    background: rgba(255,255,255,0.03);
+                    border: 1px solid rgba(255,255,255,0.1);
+                    border-radius: 18px; padding: 28px 32px;
+                    box-shadow: 0 20px 48px rgba(0,0,0,0.4);
                 }
 
-                .form-logo-wrap {
-                    display: flex;
-                    align-items: center;
-                    gap: 10px;
-                    margin-bottom: 28px;
-                    text-decoration: none;
+                .rg-card-logo { display: flex; align-items: center; gap: 9px; margin-bottom: 18px; text-decoration: none; }
+                .rg-card-logo-mark {
+                    width: 28px; height: 28px; background: #f0b429; border-radius: 6px;
+                    display: flex; align-items: center; justify-content: center;
+                    font-family: 'Syne', sans-serif; font-weight: 800; font-size: 12px;
+                    color: #050a14; line-height: 1;
                 }
+                .rg-card-logo-text { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 14px; color: #f0f6fc; }
+                .rg-card-logo-text em { color: #f0b429; font-style: normal; }
 
-                .form-logo-icon {
-                    width: 36px; height: 36px;
-                    background: linear-gradient(135deg, #6366f1, #3b82f6);
+                .rg-title { font-family: 'Syne', sans-serif; font-size: 21px; font-weight: 800; color: #ffffff; letter-spacing: -0.02em; margin-bottom: 4px; }
+                .rg-sub { font-size: 12.5px; font-weight: 400; color: #94a3b8; margin-bottom: 18px; }
+                .rg-sub a { color: #f0b429; text-decoration: none; font-weight: 600; }
+                .rg-sub a:hover { text-decoration: underline; }
+
+                .rg-field { margin-bottom: 11px; }
+                .rg-label {
+                    display: block; font-size: 10.5px; font-weight: 700;
+                    text-transform: uppercase; letter-spacing: 0.1em;
+                    color: #94a3b8; margin-bottom: 5px;
+                }
+                .rg-input-wrap { position: relative; display: flex; align-items: center; }
+                .rg-ico { position: absolute; left: 12px; color: #64748b; display: flex; pointer-events: none; }
+
+                .rg-input {
+                    width: 100%;
+                    background: rgba(0,0,0,0.25);
+                    border: 1px solid rgba(255,255,255,0.1);
                     border-radius: 9px;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    font-weight: 800;
-                    font-size: 16px;
-                    color: white;
-                    font-family: 'Syne', sans-serif;
-                    box-shadow: 0 0 16px rgba(99,102,241,0.4);
-                }
-
-                .form-logo-text {
-                    font-family: 'Syne', sans-serif;
-                    font-weight: 700;
-                    font-size: 17px;
-                    color: white;
-                }
-                .form-logo-text span { color: #818cf8; }
-
-                .form-title {
-                    font-family: 'Syne', sans-serif;
-                    font-size: 24px;
-                    font-weight: 800;
-                    color: white;
-                    margin-bottom: 6px;
-                }
-
-                .form-sub {
-                    font-size: 13px;
-                    color: #64748b;
-                    margin-bottom: 28px;
-                }
-
-                .form-sub a {
-                    color: #818cf8;
-                    text-decoration: none;
-                    font-weight: 500;
-                }
-                .form-sub a:hover { text-decoration: underline; }
-
-                .field-wrap { margin-bottom: 16px; }
-
-                .field-label {
-                    display: block;
-                    font-size: 11px;
-                    font-weight: 700;
-                    text-transform: uppercase;
-                    letter-spacing: 0.1em;
-                    color: #475569;
-                    margin-bottom: 7px;
-                }
-
-                .field-input-wrap {
-                    position: relative;
-                    display: flex;
-                    align-items: center;
-                }
-
-                .field-icon {
-                    position: absolute;
-                    left: 14px;
-                    color: #334155;
-                    pointer-events: none;
-                    display: flex;
-                }
-
-                .field-input {
-                    width: 100%;
-                    background: rgba(255,255,255,0.04);
-                    border: 1px solid rgba(255,255,255,0.08);
-                    border-radius: 12px;
-                    padding: 11px 14px 11px 42px;
-                    font-size: 14px;
-                    color: white;
+                    padding: 10px 12px 10px 37px;
+                    font-size: 13.5px; font-weight: 400;
+                    color: #f0f6fc;
                     font-family: 'DM Sans', sans-serif;
-                    transition: all 0.2s;
-                    outline: none;
+                    outline: none; transition: border-color 0.18s, box-shadow 0.18s;
                 }
+                .rg-input::placeholder { color: #475569; }
+                .rg-input:focus { border-color: #f0b429; box-shadow: 0 0 0 3px rgba(240,180,41,0.12); background: rgba(0,0,0,0.3); }
 
-                .field-input::placeholder { color: #334155; }
+                .rg-eye { position: absolute; right: 10px; background: none; border: none; color: #64748b; cursor: pointer; display: flex; padding: 2px; transition: color 0.15s; }
+                .rg-eye:hover { color: #94a3b8; }
 
-                .field-input:focus {
-                    border-color: rgba(99,102,241,0.5);
-                    background: rgba(99,102,241,0.05);
-                    box-shadow: 0 0 0 3px rgba(99,102,241,0.1);
+                .rg-err { font-size: 11.5px; font-weight: 500; color: #f87171; margin-top: 3px; }
+
+                .rg-grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+                .rg-submit {
+                    width: 100%; padding: 12px;
+                    background: #f0b429; color: #050a14;
+                    border: none; border-radius: 9px;
+                    font-family: 'Syne', sans-serif; font-size: 14.5px; font-weight: 800;
+                    cursor: pointer; transition: all 0.2s;
+                    display: flex; align-items: center; justify-content: center; gap: 8px;
+                    letter-spacing: 0.01em; margin-top: 14px;
                 }
+                .rg-submit:hover:not(:disabled) { background: #f5c842; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(240,180,41,0.28); }
+                .rg-submit:disabled { opacity: 0.5; cursor: not-allowed; }
 
-                .field-eye {
-                    position: absolute;
-                    right: 14px;
-                    background: none;
-                    border: none;
-                    color: #334155;
-                    cursor: pointer;
-                    display: flex;
-                    padding: 0;
-                    transition: color 0.2s;
-                }
-                .field-eye:hover { color: #94a3b8; }
-
-                .field-error {
-                    font-size: 12px;
-                    color: #f87171;
-                    margin-top: 5px;
-                    margin-left: 2px;
-                }
-
-                .grid-2 {
-                    display: grid;
-                    grid-template-columns: 1fr 1fr;
-                    gap: 12px;
-                }
-
-                .submit-btn {
-                    width: 100%;
-                    padding: 13px;
-                    background: linear-gradient(135deg, #6366f1, #3b82f6);
-                    color: white;
-                    border: none;
-                    border-radius: 12px;
-                    font-family: 'Syne', sans-serif;
-                    font-size: 15px;
-                    font-weight: 700;
-                    cursor: pointer;
-                    transition: all 0.3s;
-                    box-shadow: 0 8px 25px rgba(99,102,241,0.35);
-                    margin-top: 20px;
-                    letter-spacing: 0.02em;
-                }
-
-                .submit-btn:hover:not(:disabled) {
-                    transform: translateY(-2px);
-                    box-shadow: 0 12px 35px rgba(99,102,241,0.5);
-                }
-
-                .submit-btn:disabled { opacity: 0.6; cursor: not-allowed; }
-
-                .divider {
-                    display: flex;
-                    align-items: center;
-                    gap: 12px;
-                    margin: 20px 0 0;
-                }
-
-                .divider-line { flex: 1; height: 1px; background: rgba(255,255,255,0.06); }
-                .divider-text { font-size: 12px; color: #334155; white-space: nowrap; }
-
-                @keyframes fadeSlideUp {
-                    from { opacity: 0; transform: translateY(20px); }
-                    to { opacity: 1; transform: translateY(0); }
-                }
+                .rg-divider { display: flex; align-items: center; gap: 12px; margin-top: 14px; }
+                .rg-divider-line { flex: 1; height: 1px; background: rgba(255,255,255,0.07); }
+                .rg-divider-txt { font-size: 11px; font-weight: 500; color: #475569; white-space: nowrap; }
 
                 @media (max-width: 900px) {
-                    .left-panel { display: none; }
-                    .right-panel { width: 100%; padding: 24px; }
-                    .reg-root { justify-content: center; }
+                    .rg-left { display: none; }
+                    .rg-right {
+                        width: 100%; padding: 24px;
+                        position: relative; height: auto; overflow: visible;
+                    }
+                    .rg-root { min-height: 100vh; }
                 }
             `}</style>
 
-            <div className="reg-root">
-                <div className="bg-orb bg-orb-1" />
-                <div className="bg-orb bg-orb-2" />
-                <div className="bg-orb bg-orb-3" />
-                <div className="grid-pattern" />
-
-                {/* Left Panel - Branding */}
-                <div className="left-panel">
-                    <Link href="/" className="logo-wrap">
-                        <div className="logo-icon">S</div>
-                        <span className="logo-text">Smart<span>Finance.</span></span>
+            <div className="rg-root">
+                {/* ── LEFT ── */}
+                <div className="rg-left">
+                    <Link href="/" className="rg-logo">
+                        <div className="rg-logo-mark">S</div>
+                        <span className="rg-logo-text">Smart<em>Finance</em></span>
                     </Link>
 
-                    <h1 className="left-title">
+                    <h1 className="rg-h1">
                         Bergabung &<br />
-                        Buat <span className="accent">Dampak Nyata.</span>
+                        Buat <span className="hl">Dampak</span><br />
+                        <span className="hl2">Nyata.</span>
                     </h1>
-                    <p className="left-desc">
-                        Daftarkan diri Anda dan mulai perjalanan menuju keuangan yang lebih inklusif bersama ribuan pelaku UMKM Indonesia.
-                    </p>
+                    <p className="rg-desc">Daftarkan diri dan mulai perjalanan menuju keuangan inklusif bersama ribuan pelaku UMKM Indonesia.</p>
 
-                    <div className="benefit-list">
-                        <div className="benefit-item">
-                            <div className="benefit-icon" style={{ background: 'rgba(99,102,241,0.1)' }}>
-                                <Sparkles size={20} color="#818cf8" />
+                    <div className="rg-benefits">
+                        {[
+                            { icon: <Sparkles size={15} color="#a78bfa" />, title: 'AI Credit Scoring', desc: 'Penilaian kredit otomatis berbasis machine learning yang adil dan transparan.' },
+                            { icon: <ShieldCheck size={15} color="#4ade80" />, title: 'Keamanan Terjamin', desc: 'Enkripsi end-to-end dan verifikasi KYC untuk melindungi aset digital Anda.' },
+                            { icon: <Globe size={15} color="#38bdf8" />, title: 'SDG Impact Tracking', desc: 'Pantau kontribusi nyata Anda terhadap tujuan pembangunan berkelanjutan global.' },
+                        ].map(b => (
+                            <div className="rg-benefit" key={b.title}>
+                                <div className="rg-benefit-ico">{b.icon}</div>
+                                <div>
+                                    <div className="rg-benefit-title">{b.title}</div>
+                                    <div className="rg-benefit-desc">{b.desc}</div>
+                                </div>
                             </div>
-                            <div>
-                                <div className="benefit-title">AI Credit Scoring</div>
-                                <div className="benefit-desc">Penilaian kredit otomatis berbasis machine learning yang adil dan transparan.</div>
-                            </div>
-                        </div>
-                        <div className="benefit-item">
-                            <div className="benefit-icon" style={{ background: 'rgba(52,211,153,0.1)' }}>
-                                <ShieldCheck size={20} color="#34d399" />
-                            </div>
-                            <div>
-                                <div className="benefit-title">Keamanan Terjamin</div>
-                                <div className="benefit-desc">Enkripsi end-to-end dan verifikasi KYC untuk melindungi aset digital Anda.</div>
-                            </div>
-                        </div>
-                        <div className="benefit-item">
-                            <div className="benefit-icon" style={{ background: 'rgba(59,130,246,0.1)' }}>
-                                <Globe size={20} color="#60a5fa" />
-                            </div>
-                            <div>
-                                <div className="benefit-title">SDG Impact Tracking</div>
-                                <div className="benefit-desc">Pantau kontribusi nyata Anda terhadap tujuan pembangunan berkelanjutan global.</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="sdg-bar-wrap">
-                        <div className="sdg-bar-label"><span>SDG 1 — Tanpa Kemiskinan</span><span style={{color:'#34d399'}}>74%</span></div>
-                        <div className="sdg-bar"><div className="sdg-bar-fill" style={{ width: '74%', background: 'linear-gradient(90deg, #34d399, #059669)', animationDelay: '0.3s' }} /></div>
-
-                        <div className="sdg-bar-label"><span>SDG 8 — Pekerjaan Layak</span><span style={{color:'#60a5fa'}}>88%</span></div>
-                        <div className="sdg-bar"><div className="sdg-bar-fill" style={{ width: '88%', background: 'linear-gradient(90deg, #60a5fa, #3b82f6)', animationDelay: '0.5s' }} /></div>
-
-                        <div className="sdg-bar-label"><span>SDG 9 — Industri & Inovasi</span><span style={{color:'#818cf8'}}>61%</span></div>
-                        <div className="sdg-bar"><div className="sdg-bar-fill" style={{ width: '61%', background: 'linear-gradient(90deg, #818cf8, #6366f1)', animationDelay: '0.7s' }} /></div>
+                        ))}
                     </div>
                 </div>
 
-                {/* Right Panel - Form */}
-                <div className="right-panel">
-                    <div className="form-card">
-                        <Link href="/" className="form-logo-wrap">
-                            <div className="form-logo-icon">S</div>
-                            <span className="form-logo-text">Smart<span>Finance.</span></span>
+                {/* ── RIGHT — sticky, tidak ikut scroll ── */}
+                <div className="rg-right">
+                    <div className="rg-card">
+                        <Link href="/" className="rg-card-logo">
+                            <div className="rg-card-logo-mark">S</div>
+                            <span className="rg-card-logo-text">Smart<em>Finance</em></span>
                         </Link>
 
-                        <div className="form-title">Buat Akun Baru</div>
-                        <div className="form-sub">
-                            Sudah punya akun?{" "}
-                            <Link href={route("login")}>Masuk sekarang</Link>
-                        </div>
+                        <div className="rg-title">Buat Akun Baru</div>
+                        <div className="rg-sub">Sudah punya akun? <Link href={route("login")}>Masuk sekarang</Link></div>
 
                         <form onSubmit={submit}>
-                            <div className="field-wrap">
-                                <label className="field-label">Nama Lengkap</label>
-                                <div className="field-input-wrap">
-                                    <span className="field-icon"><User size={16} /></span>
-                                    <input
-                                        type="text"
-                                        className="field-input"
-                                        value={data.name}
-                                        onChange={(e) => setData("name", e.target.value)}
+                            <div className="rg-field">
+                                <label className="rg-label">Nama Lengkap</label>
+                                <div className="rg-input-wrap">
+                                    <span className="rg-ico"><User size={13} /></span>
+                                    <input type="text" className="rg-input" value={data.name}
+                                        onChange={e => setData("name", e.target.value)}
                                         placeholder="Masukkan nama lengkap..."
-                                        autoComplete="name"
-                                        required
-                                    />
+                                        autoComplete="name" required />
                                 </div>
-                                {errors.name && <div className="field-error">{errors.name}</div>}
+                                {errors.name && <div className="rg-err">{errors.name}</div>}
                             </div>
 
-                            <div className="field-wrap">
-                                <label className="field-label">Email Address</label>
-                                <div className="field-input-wrap">
-                                    <span className="field-icon"><Mail size={16} /></span>
-                                    <input
-                                        type="email"
-                                        className="field-input"
-                                        value={data.email}
-                                        onChange={(e) => setData("email", e.target.value)}
+                            <div className="rg-field">
+                                <label className="rg-label">NIK (16 Digit)</label>
+                                <div className="rg-input-wrap">
+                                    <span className="rg-ico"><CreditCard size={13} /></span>
+                                    <input type="text" className="rg-input" value={data.nik}
+                                        onChange={e => setData("nik", e.target.value.replace(/\D/g, '').slice(0, 16))}
+                                        placeholder="Masukkan 16 digit NIK..."
+                                        maxLength={16} required />
+                                </div>
+                                {errors.nik && <div className="rg-err">{errors.nik}</div>}
+                                {data.nik && data.nik.length < 16 && data.nik.length > 0 && (
+                                    <div className="rg-err">NIK harus 16 digit ({data.nik.length}/16)</div>
+                                )}
+                            </div>
+
+                            <div className="rg-field">
+                                <label className="rg-label">Email Address</label>
+                                <div className="rg-input-wrap">
+                                    <span className="rg-ico"><Mail size={13} /></span>
+                                    <input type="email" className="rg-input" value={data.email}
+                                        onChange={e => setData("email", e.target.value)}
                                         placeholder="nama@email.com"
-                                        autoComplete="email"
-                                        required
-                                    />
+                                        autoComplete="email" required />
                                 </div>
-                                {errors.email && <div className="field-error">{errors.email}</div>}
+                                {errors.email && <div className="rg-err">{errors.email}</div>}
                             </div>
 
-                            <div className="grid-2">
-                                <div className="field-wrap">
-                                    <label className="field-label">Password</label>
-                                    <div className="field-input-wrap">
-                                        <span className="field-icon"><Lock size={16} /></span>
-                                        <input
-                                            type={showPassword ? "text" : "password"}
-                                            className="field-input"
+                            <div className="rg-grid2">
+                                <div className="rg-field">
+                                    <label className="rg-label">Password</label>
+                                    <div className="rg-input-wrap">
+                                        <span className="rg-ico"><Lock size={13} /></span>
+                                        <input type={showPw ? "text" : "password"} className="rg-input"
                                             value={data.password}
-                                            onChange={(e) => setData("password", e.target.value)}
+                                            onChange={e => setData("password", e.target.value)}
                                             placeholder="Min. 8 karakter"
-                                            autoComplete="new-password"
-                                            required
-                                        />
-                                        <button type="button" className="field-eye" onClick={() => setShowPassword(!showPassword)}>
-                                            {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
+                                            autoComplete="new-password" required />
+                                        <button type="button" className="rg-eye" onClick={() => setShowPw(!showPw)}>
+                                            {showPw ? <EyeOff size={13} /> : <Eye size={13} />}
                                         </button>
                                     </div>
-                                    {errors.password && <div className="field-error">{errors.password}</div>}
+                                    {errors.password && <div className="rg-err">{errors.password}</div>}
                                 </div>
 
-                                <div className="field-wrap">
-                                    <label className="field-label">Konfirmasi</label>
-                                    <div className="field-input-wrap">
-                                        <span className="field-icon"><Lock size={16} /></span>
-                                        <input
-                                            type={showConfirm ? "text" : "password"}
-                                            className="field-input"
+                                <div className="rg-field">
+                                    <label className="rg-label">Konfirmasi</label>
+                                    <div className="rg-input-wrap">
+                                        <span className="rg-ico"><Lock size={13} /></span>
+                                        <input type={showCf ? "text" : "password"} className="rg-input"
                                             value={data.password_confirmation}
-                                            onChange={(e) => setData("password_confirmation", e.target.value)}
+                                            onChange={e => setData("password_confirmation", e.target.value)}
                                             placeholder="Ulangi password"
-                                            autoComplete="new-password"
-                                            required
-                                        />
-                                        <button type="button" className="field-eye" onClick={() => setShowConfirm(!showConfirm)}>
-                                            {showConfirm ? <EyeOff size={15} /> : <Eye size={15} />}
+                                            autoComplete="new-password" required />
+                                        <button type="button" className="rg-eye" onClick={() => setShowCf(!showCf)}>
+                                            {showCf ? <EyeOff size={13} /> : <Eye size={13} />}
                                         </button>
                                     </div>
-                                    {errors.password_confirmation && <div className="field-error">{errors.password_confirmation}</div>}
+                                    {errors.password_confirmation && <div className="rg-err">{errors.password_confirmation}</div>}
                                 </div>
                             </div>
 
-                            <button type="submit" className="submit-btn" disabled={processing}>
-                                {processing ? "Memproses..." : "Daftar Sekarang"}
+                            <button type="submit" className="rg-submit" disabled={processing}>
+                                {processing ? "Memproses..." : <><span>Daftar Sekarang</span><ArrowRight size={14} /></>}
                             </button>
                         </form>
 
-                        <div className="divider">
-                            <div className="divider-line" />
-                            <span className="divider-text">© 2026 Smart Finance · Kelompok 4</span>
-                            <div className="divider-line" />
+                        <div className="rg-divider">
+                            <div className="rg-divider-line" />
+                            <span className="rg-divider-txt">© 2026 Smart Finance · Kelompok 4</span>
+                            <div className="rg-divider-line" />
                         </div>
                     </div>
                 </div>

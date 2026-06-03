@@ -27,9 +27,22 @@ class AuthenticatedSessionController extends Controller
     /**
      * Handle an incoming authentication request.
      */
-    public function store(LoginRequest $request): RedirectResponse
+    public function store(Request $request): RedirectResponse
     {
-        $request->authenticate();
+        $request->validate([
+            'login'    => 'required|string',
+            'password' => 'required|string',
+        ]);
+
+        $loginField = $request->login;
+
+        $fieldType = (preg_match('/^\d{16}$/', $loginField)) ? 'nik' : 'email';
+
+        if (!Auth::attempt([$fieldType => $loginField, 'password' => $request->password], $request->boolean('remember'))) {
+            return back()->withErrors([
+                'login' => 'NIK/Email atau password yang Anda masukkan salah.',
+            ])->onlyInput('login');
+        }
 
         $request->session()->regenerate();
 

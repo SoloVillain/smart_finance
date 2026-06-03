@@ -17,8 +17,8 @@ type LoanItem = {
     sdg_type: string;
     amount: number;
     tenor: number;
-    status: string; // "pending" | "aktif" | etc
-    payment_status: string; // "belum_lunas" | "lunas"
+    status: string;
+    payment_status: string; 
     skor_kredit: number;
     ktp_path: string | null;
     created_at: string;
@@ -69,13 +69,15 @@ export default function Monitoring({ loans }: MonitoringProps) {
                 onSuccess: () => {
                     setLoanRows((prev) =>
                         prev.map((l) =>
-                            l.id === payingItem.id ? { ...l, payment_status: "lunas" } : l
-                        )
+                            l.id === payingItem.id
+                                ? { ...l, payment_status: "lunas" }
+                                : l,
+                        ),
                     );
                     setPaid(true);
                 },
                 onFinish: () => setVerifying(false),
-            }
+            },
         );
     };
 
@@ -105,35 +107,44 @@ export default function Monitoring({ loans }: MonitoringProps) {
         <AuthenticatedLayout>
             <Head title="Monitoring SDGs - Smart Finance" />
             <style>{`
+                /* Wrapper luar dipaksa menjadi scrollable kontainer */
+                .scroll-wrapper {
+                    width: 100%;
+                    height: calc(100vh - 65px); /* Menyesuaikan sisa tinggi navbar */
+                    overflow-y: auto !important; /* Memaksa scrollbar aktif jika data penuh */
+                    overflow-x: hidden;
+                    background: #020617;
+                }
+
                 .mon-root {
                     font-family: 'DM Sans', sans-serif;
-                    background: #020617;
-                    min-height: 100vh;
-                    padding: 88px 24px 60px;
+                    min-height: 100%;
+                    padding: 32px 24px 60px; /* Jarak atas dirapatkan dari 88px ke 32px */
                     position: relative;
-                    overflow-x: hidden;
                 }
 
                 .sf-display { font-family: 'Syne', sans-serif; }
 
+                /* DIUBAH: Menggunakan absolute agar background melar mengikuti panjang data saat di-scroll */
                 .mon-bg-orb {
-                    position: fixed;
+                    position: absolute;
                     border-radius: 50%;
                     filter: blur(100px);
                     pointer-events: none;
                     z-index: 0;
                     animation: orbFloat 12s ease-in-out infinite;
                 }
-                .mon-bg-orb-1 { width: 600px; height: 600px; background: rgba(59,130,246,0.07); top: -200px; left: -100px; }
-                .mon-bg-orb-2 { width: 400px; height: 400px; background: rgba(99,102,241,0.06); bottom: 0; right: -100px; animation-delay: -6s; }
+                .mon-bg-orb-1 { width: 600px; height: 600px; background: rgba(59,130,246,0.07); top: -100px; left: -100px; }
+                .mon-bg-orb-2 { width: 400px; height: 400px; background: rgba(99,102,241,0.06); bottom: 10%; right: -100px; animation-delay: -6s; }
 
                 @keyframes orbFloat {
                     0%, 100% { transform: translate(0,0); }
                     50% { transform: translate(30px,-30px); }
                 }
 
+                /* DIUBAH: Menjadi absolute agar grid background menutupi seluruh baris data */
                 .mon-grid {
-                    position: fixed;
+                    position: absolute;
                     inset: 0;
                     background-image: linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
                     background-size: 60px 60px;
@@ -148,7 +159,7 @@ export default function Monitoring({ loans }: MonitoringProps) {
                     margin: 0 auto;
                 }
 
-                .page-header { margin-bottom: 28px; animation: fadeUp 0.4s ease both; }
+                .page-header { margin-bottom: 24px; animation: fadeUp 0.4s ease both; }
 
                 .page-title {
                     font-family: 'Syne', sans-serif;
@@ -159,17 +170,18 @@ export default function Monitoring({ loans }: MonitoringProps) {
                 }
 
                 .page-title span {
-                    background: linear-gradient(135deg, #60a5fa, #818cf8);
+                    background: linear-gradient(135deg, #f0b429, #f7d070);
                     -webkit-background-clip: text;
                     -webkit-text-fill-color: transparent;
                     background-clip: text;
                 }
 
-                .page-sub { font-size: 14px; color: #475569; }
+                /* DIUBAH: Kontras subtitle atas dinaikkan */
+                .page-sub { font-size: 14px; color: #94a3b8; }
 
                 .table-card {
                     background: rgba(15,23,42,0.7);
-                    border: 1px solid rgba(255,255,255,0.06);
+                    border: 1px solid rgba(255,255,255,0.12); /* Border dibuat lebih tegas */
                     border-radius: 24px;
                     overflow: hidden;
                     backdrop-filter: blur(10px);
@@ -177,8 +189,8 @@ export default function Monitoring({ loans }: MonitoringProps) {
                 }
 
                 .table-header {
-                    padding: 24px 28px;
-                    border-bottom: 1px solid rgba(255,255,255,0.05);
+                    padding: 20px 24px; /* Jarak dalam header dirapatkan sedikit */
+                    border-bottom: 1px solid rgba(255,255,255,0.08);
                     display: flex;
                     justify-content: space-between;
                     align-items: center;
@@ -195,26 +207,31 @@ export default function Monitoring({ loans }: MonitoringProps) {
                     margin-bottom: 4px;
                 }
 
-                .table-sub { font-size: 13px; color: #475569; }
+                /* DIUBAH: Kontras tulisan sub-tabel dinaikkan */
+                .table-sub { font-size: 13px; color: #cbd5e1; }
 
                 table { width: 100%; border-collapse: collapse; }
-                thead tr { background: rgba(255,255,255,0.02); }
-                thead th { padding: 14px 20px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.15em; color: #334155; text-align: left; white-space: nowrap; }
-                tbody tr { border-top: 1px solid rgba(255,255,255,0.04); transition: background 0.2s; }
+                thead tr { background: rgba(255,255,255,0.03); }
+
+                /* DIUBAH: Text header tabel dinaikkan ukurannya ke 11px dan warnanya dibuat abu-abu cerah */
+                thead th { padding: 14px 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: #cbd5e1; text-align: left; white-space: nowrap; }
+                tbody tr { border-top: 1px solid rgba(255,255,255,0.06); transition: background 0.2s; }
                 tbody tr:hover { background: rgba(59,130,246,0.04); }
-                tbody td { padding: 16px 20px; font-size: 14px; color: #94a3b8; vertical-align: middle; }
+
+                /* DIUBAH: Isi baris tabel teksnya diganti ke warna yang lebih cerah terang */
+                tbody td { padding: 14px 20px; font-size: 14px; color: #e2e8f0; vertical-align: middle; }
 
                 .td-program { font-weight: 600; color: white; }
                 tbody tr:hover .td-program { color: #60a5fa; }
 
                 .sdg-badge {
                     padding: 4px 12px;
-                    background: rgba(59,130,246,0.1);
-                    border: 1px solid rgba(59,130,246,0.2);
+                    background: rgba(240, 180, 41, 0.1);
+                    border: 1px solid rgba(240, 180, 41, 0.25);
                     border-radius: 100px;
-                    font-size: 10px;
+                    font-size: 11px;
                     font-weight: 700;
-                    color: #60a5fa;
+                    color: #f0b429;
                     text-transform: uppercase;
                     letter-spacing: 0.08em;
                 }
@@ -230,14 +247,14 @@ export default function Monitoring({ loans }: MonitoringProps) {
                     width: 64px; height: 42px;
                     object-fit: cover;
                     border-radius: 8px;
-                    border: 1px solid rgba(255,255,255,0.1);
+                    border: 1px solid rgba(255,255,255,0.15);
                     cursor: pointer;
                     transition: all 0.2s;
                     display: block;
                 }
 
                 .ktp-thumb:hover {
-                    border-color: rgba(59,130,246,0.4);
+                    border-color: rgba(59,130,246,0.5);
                     transform: scale(1.05);
                 }
 
@@ -255,12 +272,12 @@ export default function Monitoring({ loans }: MonitoringProps) {
                     gap: 5px;
                     width: 64px;
                     padding: 5px 0;
-                    background: rgba(59,130,246,0.08);
-                    border: 1px solid rgba(59,130,246,0.2);
+                    background: rgba(240, 180, 41, 0.1);
+                    border: 1px solid rgba(240, 180, 41, 0.25);
                     border-radius: 6px;
                     font-size: 11px;
                     font-weight: 600;
-                    color: #60a5fa;
+                    color: #f0b429;
                     cursor: pointer;
                     margin-top: 0;
                     font-family: 'Syne', sans-serif;
@@ -268,11 +285,12 @@ export default function Monitoring({ loans }: MonitoringProps) {
                     transition: all 0.2s;
                 }
 
-                .ktp-view-btn:hover { background: rgba(59,130,246,0.15); }
+                .ktp-view-btn:hover { background: rgba(59,130,246,0.2); color: white; }
 
+                /* DIUBAH: Tulisan tidak ada file dibuat abu-abu medium agar kelihatan */
                 .ktp-no-file {
-                    font-size: 11px;
-                    color: #334155;
+                    font-size: 12px;
+                    color: #64748b;
                     font-style: italic;
                 }
 
@@ -282,7 +300,7 @@ export default function Monitoring({ loans }: MonitoringProps) {
                     align-items: center;
                     gap: 6px;
                     padding: 7px 16px;
-                    background: linear-gradient(135deg, #3b82f6, #6366f1);
+                    background: linear-gradient(135deg, #f0b429, #f7d070);
                     border: none;
                     border-radius: 8px;
                     font-size: 12px;
@@ -291,22 +309,18 @@ export default function Monitoring({ loans }: MonitoringProps) {
                     cursor: pointer;
                     transition: all 0.2s;
                     font-family: 'Syne', sans-serif;
-                    box-shadow: 0 4px 12px rgba(59,130,246,0.3);
+                    box-shadow: 0 4px 12px rgba(240, 180, 41, 0.2);
                     white-space: nowrap;
                 }
 
                 .btn-pay:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(59,130,246,0.45); }
-
-                .btn-pay:disabled {
-                    opacity: 0.5;
-                    cursor: not-allowed;
-                    transform: none;
-                    box-shadow: none;
-                }
+                .btn-pay:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
 
                 /* Empty State */
-                .empty-state { padding: 80px 24px; text-align: center; }
-                .empty-text { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; margin-top: 16px; color: #334155; }
+                .empty-state { padding: 60px 24px; text-align: center; }
+
+                /* DIUBAH: Kontras teks tabel kosong dinaikkan */
+                .empty-text { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; margin-top: 16px; color: #94a3b8; }
 
                 /* KTP Modal */
                 .ktp-modal-overlay {
@@ -326,7 +340,7 @@ export default function Monitoring({ loans }: MonitoringProps) {
                     max-width: 90vw;
                     max-height: 80vh;
                     border-radius: 16px;
-                    border: 1px solid rgba(255,255,255,0.1);
+                    border: 1px solid rgba(255,255,255,0.15);
                     box-shadow: 0 40px 80px rgba(0,0,0,0.6);
                 }
 
@@ -334,8 +348,8 @@ export default function Monitoring({ loans }: MonitoringProps) {
                     position: absolute;
                     top: 20px;
                     right: 20px;
-                    background: rgba(255,255,255,0.1);
-                    border: none;
+                    background: rgba(255,255,255,0.15);
+                    border: 1px solid rgba(255,255,255,0.2);
                     border-radius: 10px;
                     padding: 8px;
                     cursor: pointer;
@@ -343,7 +357,7 @@ export default function Monitoring({ loans }: MonitoringProps) {
                     transition: all 0.2s;
                 }
 
-                .ktp-close:hover { background: rgba(255,255,255,0.2); }
+                .ktp-close:hover { background: rgba(255,255,255,0.3); }
 
                 /* Payment Modal */
                 .modal-overlay {
@@ -361,7 +375,7 @@ export default function Monitoring({ loans }: MonitoringProps) {
 
                 .modal-card {
                     background: #0f172a;
-                    border: 1px solid rgba(255,255,255,0.1);
+                    border: 1px solid rgba(255,255,255,0.15);
                     border-radius: 28px;
                     padding: 36px;
                     width: 100%;
@@ -380,14 +394,15 @@ export default function Monitoring({ loans }: MonitoringProps) {
                     border-radius: 8px;
                     padding: 6px;
                     cursor: pointer;
-                    color: #64748b;
+                    color: #94a3b8; /* Diperterang */
                     transition: all 0.2s;
                 }
 
                 .modal-close-btn:hover { color: white; background: rgba(255,255,255,0.1); }
-
                 .modal-title { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 800; color: white; margin-bottom: 6px; }
-                .modal-sub { font-size: 13px; color: #475569; margin-bottom: 16px; }
+
+                /* DIUBAH: Subtitle modal dibuat abu-abu terang */
+                .modal-sub { font-size: 13px; color: #cbd5e1; margin-bottom: 16px; }
                 .modal-amount { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800; color: #60a5fa; margin-bottom: 24px; }
 
                 /* QRIS */
@@ -409,32 +424,32 @@ export default function Monitoring({ loans }: MonitoringProps) {
                     letter-spacing: 0.1em;
                 }
 
+                /* DIUBAH: Hint teks dalam modal diperterang */
                 .modal-hint {
                     font-size: 12px;
-                    color: #475569;
+                    color: #cbd5e1;
                     margin-bottom: 20px;
                     line-height: 1.6;
                 }
 
                 .modal-hint strong { color: #60a5fa; }
-
                 .modal-actions { display: flex; gap: 10px; }
 
                 .btn-cancel-pay {
                     flex: 1;
                     padding: 12px;
                     background: rgba(255,255,255,0.04);
-                    border: 1px solid rgba(255,255,255,0.08);
+                    border: 1px solid rgba(255,255,255,0.15);
                     border-radius: 12px;
                     font-family: 'Syne', sans-serif;
                     font-size: 14px;
                     font-weight: 600;
-                    color: #64748b;
+                    color: #cbd5e1; /* Diperterang */
                     cursor: pointer;
                     transition: all 0.2s;
                 }
 
-                .btn-cancel-pay:hover { color: white; border-color: rgba(255,255,255,0.15); }
+                .btn-cancel-pay:hover { color: white; border-color: rgba(255,255,255,0.3); }
 
                 .btn-verify {
                     flex: 2;
@@ -472,7 +487,9 @@ export default function Monitoring({ loans }: MonitoringProps) {
                 }
 
                 .success-title { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800; color: white; margin-bottom: 8px; }
-                .success-sub { font-size: 14px; color: #475569; margin-bottom: 16px; line-height: 1.6; }
+
+                /* DIUBAH: Subtitle sukses modal diperterang */
+                .success-sub { font-size: 14px; color: #cbd5e1; margin-bottom: 16px; line-height: 1.6; }
                 .success-amount { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 700; color: #34d399; margin-bottom: 24px; }
 
                 .btn-done {
@@ -507,7 +524,8 @@ export default function Monitoring({ loans }: MonitoringProps) {
                             Monitoring <span>Program SDGs.</span>
                         </div>
                         <div className="page-sub">
-                            Laporan real-time riwayat pinjaman dan status kontribusi SDG Anda
+                            Laporan real-time riwayat pinjaman dan status
+                            kontribusi SDG Anda
                         </div>
                     </div>
 
@@ -515,10 +533,12 @@ export default function Monitoring({ loans }: MonitoringProps) {
                         <div className="table-header">
                             <div>
                                 <div className="table-title sf-display">
-                                    <History size={18} color="#60a5fa" />
+                                    <History size={18} color="#f0b429" />
                                     Riwayat Pinjaman
                                 </div>
-                                <div className="table-sub">Total {loanRows.length} pinjaman terdaftar</div>
+                                <div className="table-sub">
+                                    Total {loanRows.length} pinjaman terdaftar
+                                </div>
                             </div>
                         </div>
 
@@ -542,23 +562,50 @@ export default function Monitoring({ loans }: MonitoringProps) {
                                     {loanRows.length > 0 ? (
                                         loanRows.map((item) => (
                                             <tr key={item.id}>
-                                                <td style={{ color: "#64748b", fontSize: "12px", whiteSpace: "nowrap" }}>
+                                                <td
+                                                    style={{
+                                                        color: "#f0b429",
+                                                        fontSize: "12px",
+                                                        whiteSpace: "nowrap",
+                                                    }}
+                                                >
                                                     {item.created_at}
                                                 </td>
-                                                <td className="td-program">{item.program_name}</td>
-                                                <td><span className="sdg-badge">{item.sdg_type}</span></td>
-                                                <td className="td-amount">Rp {Number(item.amount).toLocaleString("id-ID")}</td>
-                                                <td style={{ color: "#94a3b8" }}>{item.tenor} bln</td>
+                                                <td className="td-program">
+                                                    {item.program_name}
+                                                </td>
+                                                <td>
+                                                    <span className="sdg-badge">
+                                                        {item.sdg_type}
+                                                    </span>
+                                                </td>
+                                                <td className="td-amount">
+                                                    Rp{" "}
+                                                    {Number(
+                                                        item.amount,
+                                                    ).toLocaleString("id-ID")}
+                                                </td>
+                                                <td
+                                                    style={{ color: "#f0b429" }}
+                                                >
+                                                    {item.tenor} bln
+                                                </td>
                                                 <td>
                                                     <span
                                                         style={{
-                                                            fontFamily: "Syne, sans-serif",
+                                                            fontFamily:
+                                                                "Syne, sans-serif",
                                                             fontWeight: 700,
-                                                            color: item.skor_kredit >= 70 ? "#34d399" : "#f87171",
+                                                            color:
+                                                                item.skor_kredit >=
+                                                                70
+                                                                    ? "#34d399"
+                                                                    : "#f87171",
                                                             fontSize: "13px",
                                                         }}
                                                     >
-                                                        {item.skor_kredit || "N/A"}
+                                                        {item.skor_kredit ||
+                                                            "N/A"}
                                                     </span>
                                                 </td>
 
@@ -567,11 +614,21 @@ export default function Monitoring({ loans }: MonitoringProps) {
                                                         <div
                                                             className="status-dot"
                                                             style={{
-                                                                background: statusColor(item.status),
+                                                                background:
+                                                                    statusColor(
+                                                                        item.status,
+                                                                    ),
                                                                 boxShadow: `0 0 6px ${statusColor(item.status)}`,
                                                             }}
                                                         />
-                                                        <span className="status-text" style={{ color: statusColor(item.status) }}>
+                                                        <span
+                                                            className="status-text"
+                                                            style={{
+                                                                color: statusColor(
+                                                                    item.status,
+                                                                ),
+                                                            }}
+                                                        >
                                                             {item.status}
                                                         </span>
                                                     </div>
@@ -582,12 +639,24 @@ export default function Monitoring({ loans }: MonitoringProps) {
                                                         <div
                                                             className="status-dot"
                                                             style={{
-                                                                background: paymentColor(item.payment_status),
+                                                                background:
+                                                                    paymentColor(
+                                                                        item.payment_status,
+                                                                    ),
                                                                 boxShadow: `0 0 6px ${paymentColor(item.payment_status)}`,
                                                             }}
                                                         />
-                                                        <span className="status-text" style={{ color: paymentColor(item.payment_status) }}>
-                                                            {paymentLabel(item.payment_status)}
+                                                        <span
+                                                            className="status-text"
+                                                            style={{
+                                                                color: paymentColor(
+                                                                    item.payment_status,
+                                                                ),
+                                                            }}
+                                                        >
+                                                            {paymentLabel(
+                                                                item.payment_status,
+                                                            )}
                                                         </span>
                                                     </div>
                                                 </td>
@@ -596,39 +665,57 @@ export default function Monitoring({ loans }: MonitoringProps) {
                                                     {item.ktp_path ? (
                                                         <div className="ktp-doc">
                                                             <img
-                                                                src={item.ktp_path}
+                                                                src={
+                                                                    item.ktp_path
+                                                                }
                                                                 className="ktp-thumb"
                                                                 alt="KTP"
-                                                                onClick={() => setKtpModal(item.ktp_path)}
+                                                                onClick={() =>
+                                                                    setKtpModal(
+                                                                        item.ktp_path,
+                                                                    )
+                                                                }
                                                             />
                                                             <a
-                                                                href={item.ktp_path}
+                                                                href={
+                                                                    item.ktp_path
+                                                                }
                                                                 target="_blank"
                                                                 rel="noopener noreferrer"
                                                                 className="ktp-view-btn"
                                                             >
-                                                                <ExternalLink size={10} /> Lihat
+                                                                <ExternalLink
+                                                                    size={10}
+                                                                />{" "}
+                                                                Lihat
                                                             </a>
                                                         </div>
                                                     ) : (
-                                                        <span className="ktp-no-file">Tidak ada</span>
+                                                        <span className="ktp-no-file">
+                                                            Tidak ada
+                                                        </span>
                                                     )}
                                                 </td>
 
                                                 <td>
                                                     <button
                                                         className="btn-pay"
-                                                        onClick={() => openPayment(item)}
+                                                        onClick={() =>
+                                                            openPayment(item)
+                                                        }
                                                         disabled={!canPay(item)}
                                                         title={
-                                                            item.payment_status === "lunas"
+                                                            item.payment_status ===
+                                                            "lunas"
                                                                 ? "Sudah lunas"
-                                                                : item.status !== "aktif"
-                                                                ? "Menunggu persetujuan admin"
-                                                                : undefined
+                                                                : item.status !==
+                                                                    "aktif"
+                                                                  ? "Menunggu persetujuan admin"
+                                                                  : undefined
                                                         }
                                                     >
-                                                        <QrCode size={13} /> {payButtonLabel(item)}
+                                                        <QrCode size={13} />{" "}
+                                                        {payButtonLabel(item)}
                                                     </button>
                                                 </td>
                                             </tr>
@@ -637,8 +724,17 @@ export default function Monitoring({ loans }: MonitoringProps) {
                                         <tr>
                                             <td colSpan={10}>
                                                 <div className="empty-state">
-                                                    <PieChart size={40} color="#1e293b" style={{ margin: "0 auto" }} />
-                                                    <div className="empty-text">Belum ada riwayat pinjaman</div>
+                                                    <PieChart
+                                                        size={40}
+                                                        color="#1e293b"
+                                                        style={{
+                                                            margin: "0 auto",
+                                                        }}
+                                                    />
+                                                    <div className="empty-text">
+                                                        Belum ada riwayat
+                                                        pinjaman
+                                                    </div>
                                                 </div>
                                             </td>
                                         </tr>
@@ -652,7 +748,10 @@ export default function Monitoring({ loans }: MonitoringProps) {
 
             {/* KTP Full View Modal */}
             {ktpModal && (
-                <div className="ktp-modal-overlay" onClick={() => setKtpModal(null)}>
+                <div
+                    className="ktp-modal-overlay"
+                    onClick={() => setKtpModal(null)}
+                >
                     <button
                         className="ktp-close"
                         onClick={(e) => {
@@ -673,46 +772,141 @@ export default function Monitoring({ loans }: MonitoringProps) {
 
             {/* Payment Modal */}
             {payingItem && (
-                <div className="modal-overlay" onClick={!paid ? closePayment : undefined}>
-                    <div className="modal-card" onClick={(e) => e.stopPropagation()}>
-                        <button className="modal-close-btn" onClick={closePayment}>
+                <div
+                    className="modal-overlay"
+                    onClick={!paid ? closePayment : undefined}
+                >
+                    <div
+                        className="modal-card"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <button
+                            className="modal-close-btn"
+                            onClick={closePayment}
+                        >
                             <X size={16} />
                         </button>
 
                         {!paid ? (
                             <>
-                                <div className="modal-title sf-display">Pembayaran QRIS</div>
-                                <div className="modal-sub">{payingItem.program_name}</div>
+                                <div className="modal-title sf-display">
+                                    Pembayaran QRIS
+                                </div>
+                                <div className="modal-sub">
+                                    {payingItem.program_name}
+                                </div>
                                 <div className="modal-amount">
-                                    Rp {Number(payingItem.amount).toLocaleString("id-ID")}
+                                    Rp{" "}
+                                    {Number(payingItem.amount).toLocaleString(
+                                        "id-ID",
+                                    )}
                                 </div>
 
                                 <div className="qris-wrap">
-                                    <div className="qris-label">⚡ SCAN UNTUK MEMBAYAR</div>
-                                    <svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-                                        <rect x="10" y="10" width="60" height="60" rx="4" fill="#1e3a5f" />
-                                        <rect x="18" y="18" width="44" height="44" rx="2" fill="white" />
-                                        <rect x="26" y="26" width="28" height="28" rx="1" fill="#1e3a5f" />
-                                        <rect x="130" y="10" width="60" height="60" rx="4" fill="#1e3a5f" />
-                                        <rect x="138" y="18" width="44" height="44" rx="2" fill="white" />
-                                        <rect x="146" y="26" width="28" height="28" rx="1" fill="#1e3a5f" />
-                                        <rect x="10" y="130" width="60" height="60" rx="4" fill="#1e3a5f" />
-                                        <rect x="18" y="138" width="44" height="44" rx="2" fill="white" />
-                                        <rect x="26" y="146" width="28" height="28" rx="1" fill="#1e3a5f" />
+                                    <div className="qris-label">
+                                        ⚡ SCAN UNTUK MEMBAYAR
+                                    </div>
+                                    <svg
+                                        width="200"
+                                        height="200"
+                                        viewBox="0 0 200 200"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                    >
+                                        <rect
+                                            x="10"
+                                            y="10"
+                                            width="60"
+                                            height="60"
+                                            rx="4"
+                                            fill="#1e3a5f"
+                                        />
+                                        <rect
+                                            x="18"
+                                            y="18"
+                                            width="44"
+                                            height="44"
+                                            rx="2"
+                                            fill="white"
+                                        />
+                                        <rect
+                                            x="26"
+                                            y="26"
+                                            width="28"
+                                            height="28"
+                                            rx="1"
+                                            fill="#1e3a5f"
+                                        />
+                                        <rect
+                                            x="130"
+                                            y="10"
+                                            width="60"
+                                            height="60"
+                                            rx="4"
+                                            fill="#1e3a5f"
+                                        />
+                                        <rect
+                                            x="138"
+                                            y="18"
+                                            width="44"
+                                            height="44"
+                                            rx="2"
+                                            fill="white"
+                                        />
+                                        <rect
+                                            x="146"
+                                            y="26"
+                                            width="28"
+                                            height="28"
+                                            rx="1"
+                                            fill="#1e3a5f"
+                                        />
+                                        <rect
+                                            x="10"
+                                            y="130"
+                                            width="60"
+                                            height="60"
+                                            rx="4"
+                                            fill="#1e3a5f"
+                                        />
+                                        <rect
+                                            x="18"
+                                            y="138"
+                                            width="44"
+                                            height="44"
+                                            rx="2"
+                                            fill="white"
+                                        />
+                                        <rect
+                                            x="26"
+                                            y="146"
+                                            width="28"
+                                            height="28"
+                                            rx="1"
+                                            fill="#1e3a5f"
+                                        />
                                         {[80, 90, 100, 110, 120].map((x) =>
-                                            [15, 25, 35, 45, 55, 65].map((y) => (
-                                                <rect
-                                                    key={`a${x}${y}`}
-                                                    x={x}
-                                                    y={y}
-                                                    width="7"
-                                                    height="7"
-                                                    rx="1"
-                                                    fill={Math.sin(x * y) > 0 ? "#1e3a5f" : "transparent"}
-                                                />
-                                            ))
+                                            [15, 25, 35, 45, 55, 65].map(
+                                                (y) => (
+                                                    <rect
+                                                        key={`a${x}${y}`}
+                                                        x={x}
+                                                        y={y}
+                                                        width="7"
+                                                        height="7"
+                                                        rx="1"
+                                                        fill={
+                                                            Math.sin(x * y) > 0
+                                                                ? "#1e3a5f"
+                                                                : "transparent"
+                                                        }
+                                                    />
+                                                ),
+                                            ),
                                         )}
-                                        {[15, 25, 35, 45, 55, 65, 75, 85, 95, 105, 115, 125].map((x) =>
+                                        {[
+                                            15, 25, 35, 45, 55, 65, 75, 85, 95,
+                                            105, 115, 125,
+                                        ].map((x) =>
                                             [80, 90, 100, 110, 120].map((y) => (
                                                 <rect
                                                     key={`b${x}${y}`}
@@ -721,51 +915,103 @@ export default function Monitoring({ loans }: MonitoringProps) {
                                                     width="7"
                                                     height="7"
                                                     rx="1"
-                                                    fill={Math.cos(x + y) > 0 ? "#1e3a5f" : "transparent"}
+                                                    fill={
+                                                        Math.cos(x + y) > 0
+                                                            ? "#1e3a5f"
+                                                            : "transparent"
+                                                    }
                                                 />
-                                            ))
+                                            )),
                                         )}
-                                        {[130, 140, 150, 160, 170, 180].map((x) =>
-                                            [80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180].map((y) => (
-                                                <rect
-                                                    key={`c${x}${y}`}
-                                                    x={x}
-                                                    y={y}
-                                                    width="7"
-                                                    height="7"
-                                                    rx="1"
-                                                    fill={Math.sin(x - y) > 0.2 ? "#1e3a5f" : "transparent"}
-                                                />
-                                            ))
+                                        {[130, 140, 150, 160, 170, 180].map(
+                                            (x) =>
+                                                [
+                                                    80, 90, 100, 110, 120, 130,
+                                                    140, 150, 160, 170, 180,
+                                                ].map((y) => (
+                                                    <rect
+                                                        key={`c${x}${y}`}
+                                                        x={x}
+                                                        y={y}
+                                                        width="7"
+                                                        height="7"
+                                                        rx="1"
+                                                        fill={
+                                                            Math.sin(x - y) >
+                                                            0.2
+                                                                ? "#1e3a5f"
+                                                                : "transparent"
+                                                        }
+                                                    />
+                                                )),
                                         )}
-                                        <rect x="82" y="82" width="36" height="36" rx="8" fill="#3b82f6" />
-                                        <text x="100" y="106" textAnchor="middle" fill="white" fontSize="18" fontWeight="bold" fontFamily="Arial">
+                                        <rect
+                                            x="82"
+                                            y="82"
+                                            width="36"
+                                            height="36"
+                                            rx="8"
+                                            fill="#3b82f6"
+                                        />
+                                        <text
+                                            x="100"
+                                            y="106"
+                                            textAnchor="middle"
+                                            fill="white"
+                                            fontSize="18"
+                                            fontWeight="bold"
+                                            fontFamily="Arial"
+                                        >
                                             S
                                         </text>
                                     </svg>
-                                    <div style={{ fontSize: "10px", color: "#6b7280", textAlign: "center", marginTop: "8px", fontWeight: 600 }}>
+                                    <div
+                                        style={{
+                                            fontSize: "10px",
+                                            color: "#6b7280",
+                                            textAlign: "center",
+                                            marginTop: "8px",
+                                            fontWeight: 600,
+                                        }}
+                                    >
                                         Smart Finance · QRIS
                                     </div>
                                 </div>
 
                                 <div className="modal-hint">
-                                    Scan kode QRIS menggunakan aplikasi mobile banking atau e-wallet, lalu klik{" "}
-                                    <strong>Verifikasi Pembayaran</strong> setelah selesai.
+                                    Scan kode QRIS menggunakan aplikasi mobile
+                                    banking atau e-wallet, lalu klik{" "}
+                                    <strong>Verifikasi Pembayaran</strong>{" "}
+                                    setelah selesai.
                                 </div>
 
                                 <div className="modal-actions">
-                                    <button className="btn-cancel-pay" onClick={closePayment}>
+                                    <button
+                                        className="btn-cancel-pay"
+                                        onClick={closePayment}
+                                    >
                                         Batal
                                     </button>
-                                    <button className="btn-verify" onClick={handleVerify} disabled={verifying}>
+                                    <button
+                                        className="btn-verify"
+                                        onClick={handleVerify}
+                                        disabled={verifying}
+                                    >
                                         {verifying ? (
                                             <>
-                                                <Loader size={15} style={{ animation: "spin 1s linear infinite" }} />{" "}
+                                                <Loader
+                                                    size={15}
+                                                    style={{
+                                                        animation:
+                                                            "spin 1s linear infinite",
+                                                    }}
+                                                />{" "}
                                                 Memverifikasi...
                                             </>
                                         ) : (
                                             <>
-                                                <CheckCircle size={15} /> Verifikasi Pembayaran
+                                                <CheckCircle size={15} />{" "}
+                                                Verifikasi Pembayaran
                                             </>
                                         )}
                                     </button>
@@ -776,16 +1022,26 @@ export default function Monitoring({ loans }: MonitoringProps) {
                                 <div className="success-icon">
                                     <CheckCircle size={40} color="#34d399" />
                                 </div>
-                                <div className="success-title sf-display">Pembayaran Berhasil! 🎉</div>
+                                <div className="success-title sf-display">
+                                    Pembayaran Berhasil! 🎉
+                                </div>
                                 <div className="success-sub">
                                     Transaksi untuk{" "}
-                                    <strong style={{ color: "white" }}>{payingItem.program_name}</strong>{" "}
+                                    <strong style={{ color: "white" }}>
+                                        {payingItem.program_name}
+                                    </strong>{" "}
                                     telah berhasil dikonfirmasi.
                                 </div>
                                 <div className="success-amount">
-                                    Rp {Number(payingItem.amount).toLocaleString("id-ID")}
+                                    Rp{" "}
+                                    {Number(payingItem.amount).toLocaleString(
+                                        "id-ID",
+                                    )}
                                 </div>
-                                <button className="btn-done" onClick={closePayment}>
+                                <button
+                                    className="btn-done"
+                                    onClick={closePayment}
+                                >
                                     Selesai ✓
                                 </button>
                             </>

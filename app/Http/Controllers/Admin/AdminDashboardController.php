@@ -1,5 +1,7 @@
 <?php
+
 namespace App\Http\Controllers\Admin;
+
 use App\Http\Controllers\Controller;
 use App\Models\Loan;
 use App\Models\User;
@@ -38,18 +40,18 @@ class AdminDashboardController extends Controller
     public function users()
     {
         $users = User::withCount('loans')
-            ->with(['loans' => function($q) {
+            ->with(['loans' => function ($q) {
                 $q->latest()->take(1);
             }])
             ->latest()
             ->get()
-            ->map(function($user) {
+            ->map(function ($user) {
                 return [
                     'id'         => $user->id,
                     'name'       => $user->name,
                     'email'      => $user->email,
                     'created_at' => $user->created_at->format('d M Y'),
-                    'loans_count'=> $user->loans_count,
+                    'loans_count' => $user->loans_count,
                     'total_pinjaman' => $user->loans->sum('amount'),
                 ];
             });
@@ -66,34 +68,36 @@ class AdminDashboardController extends Controller
 
     public function userDetail(User $user)
     {
-        $loans = Loan::where('user_id', $user->id)
+        $loans = $user->loans()
             ->latest()
             ->get()
-            ->map(function($loan) {
+            ->map(function ($loan) {
                 return [
-                    'id'          => $loan->id,
-                    'amount'      => $loan->amount,
-                    'tenor'       => $loan->tenor,
-                    'status'      => $loan->status,
-                    'skor_kredit' => $loan->skor_kredit,
-                    'created_at'  => $loan->created_at->format('d M Y'),
+                    'id'             => $loan->id,
+                    'program_name'   => 'Pinjaman Mikro Modal Usaha',
+                    'sdg_type'       => 'SDG 8',
+                    'amount'         => $loan->amount,
+                    'tenor'          => $loan->tenor,
+                    'bunga'          => $loan->bunga,
+                    'skor_kredit'    => $loan->skor_kredit,
+                    'status'         => $loan->status,
+                    'payment_status' => $loan->payment_status ?? 'belum_lunas',
+                    'ktp_path'       => $loan->ktp_path ? asset('storage/' . $loan->ktp_path) : null,
+                    'created_at'     => $loan->created_at->format('d M Y'),
                 ];
             });
 
+        $stats = [
+            'total_pinjaman' => $user->loans()->count(),
+            'total_amount'   => $user->loans()->sum('amount'),
+            'aktif'          => $user->loans()->where('status', 'aktif')->count(),
+            'pending'        => $user->loans()->where('status', 'pending')->count(),
+        ];
+
         return Inertia::render('Admin/UserDetail', [
-            'user'  => [
-                'id'         => $user->id,
-                'name'       => $user->name,
-                'email'      => $user->email,
-                'created_at' => $user->created_at->format('d M Y'),
-            ],
+            'user'  => $user,
             'loans' => $loans,
-            'stats' => [
-                'total_pinjaman' => $loans->count(),
-                'total_amount'   => $loans->sum('amount'),
-                'aktif'          => $loans->where('status', 'aktif')->count(),
-                'pending'        => $loans->where('status', 'pending')->count(),
-            ]
+            'stats' => $stats,
         ]);
     }
 

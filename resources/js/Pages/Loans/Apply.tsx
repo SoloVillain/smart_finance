@@ -69,27 +69,33 @@ export default function Apply() {
         <AuthenticatedLayout>
             <Head title="Ajukan Pinjaman - Smart Finance" />
             <style>{`
+                .scroll-wrapper {
+                    width: 100%;
+                    height: calc(100vh - 65px);
+                    overflow-y: auto !important;
+                    overflow-x: hidden;
+                    background: #020617;
+                }
+
                 .apply-root {
                     font-family: 'DM Sans', sans-serif;
-                    background: #020617;
-                    min-height: 100vh;
-                    padding: 88px 24px 60px;
+                    min-height: 100%;
+                    padding: 40px 24px 80px;
                     position: relative;
-                    overflow-x: hidden;
                 }
 
                 .sf-display { font-family: 'Syne', sans-serif; }
 
                 .apply-bg-orb {
-                    position: fixed;
+                    position: absolute;
                     border-radius: 50%;
                     filter: blur(100px);
                     pointer-events: none;
                     z-index: 0;
                     animation: orbFloat 12s ease-in-out infinite;
                 }
-                .apply-bg-orb-1 { width: 600px; height: 600px; background: rgba(59,130,246,0.07); top: -200px; left: -100px; }
-                .apply-bg-orb-2 { width: 400px; height: 400px; background: rgba(99,102,241,0.06); bottom: 0; right: -100px; animation-delay: -6s; }
+                .apply-bg-orb-1 { width: 600px; height: 600px; background: rgba(59,130,246,0.07); top: -100px; left: -100px; }
+                .apply-bg-orb-2 { width: 400px; height: 400px; background: rgba(99,102,241,0.06); bottom: 10%; right: -100px; animation-delay: -6s; }
 
                 @keyframes orbFloat {
                     0%, 100% { transform: translate(0,0); }
@@ -97,7 +103,7 @@ export default function Apply() {
                 }
 
                 .apply-grid {
-                    position: fixed;
+                    position: absolute;
                     inset: 0;
                     background-image: linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
                     background-size: 60px 60px;
@@ -108,7 +114,7 @@ export default function Apply() {
                 .apply-content {
                     position: relative;
                     z-index: 10;
-                    max-width: 900px;
+                    max-width: 1280px;
                     margin: 0 auto;
                 }
 
@@ -123,20 +129,21 @@ export default function Apply() {
                 }
 
                 .page-title span {
-                    background: linear-gradient(135deg, #60a5fa, #818cf8);
+                    background: linear-gradient(135deg, #f0b429, #f7d070);
                     -webkit-background-clip: text;
                     -webkit-text-fill-color: transparent;
                     background-clip: text;
                 }
 
-                .page-sub { font-size: 14px; color: #475569; }
+                .page-sub { font-size: 14px; color: #94a3b8; }
 
                 .form-card {
-                    background: rgba(15,23,42,0.7);
-                    border: 1px solid rgba(255,255,255,0.06);
+                    background: rgba(255,255,255,0.03);
+                    border: 1px solid rgba(255,255,255,0.12);
                     border-radius: 24px;
                     padding: 32px;
-                    backdrop-filter: blur(10px);
+                    backdrop-filter: blur(12px);
+                    -webkit-backdrop-filter: blur(12px);
                     animation: fadeUp 0.4s ease 0.1s both;
                     margin-bottom: 20px;
                 }
@@ -154,22 +161,23 @@ export default function Apply() {
 
                 .section-icon {
                     width: 36px; height: 36px;
-                    background: rgba(59,130,246,0.1);
+                    background: rgba(240, 180, 41, 0.1);
                     border-radius: 10px;
                     display: flex;
                     align-items: center;
                     justify-content: center;
+                    border: 1px solid rgba(240, 180, 41, 0.25);
                 }
 
                 .form-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
 
                 .field-label {
                     display: block;
-                    font-size: 11px;
+                    font-size: 12px;
                     font-weight: 700;
                     text-transform: uppercase;
-                    letter-spacing: 0.1em;
-                    color: #475569;
+                    letter-spacing: 0.08em;
+                    color: #cbd5e1;
                     margin-bottom: 8px;
                 }
 
@@ -178,16 +186,16 @@ export default function Apply() {
                 .field-prefix {
                     position: absolute;
                     left: 14px;
-                    font-size: 13px;
+                    font-size: 14px;
                     font-weight: 600;
-                    color: #475569;
+                    color: #94a3b8;
                     pointer-events: none;
                 }
 
                 .field-input {
                     width: 100%;
-                    background: rgba(255,255,255,0.04);
-                    border: 1px solid rgba(255,255,255,0.08);
+                    background: rgba(0, 0, 0, 0.3);
+                    border: 1px solid rgba(255,255,255,0.15);
                     border-radius: 12px;
                     padding: 12px 14px 12px 42px;
                     font-size: 14px;
@@ -198,47 +206,48 @@ export default function Apply() {
                 }
 
                 .field-input.no-prefix { padding-left: 14px; }
-                .field-input::placeholder { color: #334155; }
+
+                .field-input::placeholder { color: #64748b; }
 
                 .field-input:focus {
-                    border-color: rgba(59,130,246,0.5);
-                    background: rgba(59,130,246,0.05);
-                    box-shadow: 0 0 0 3px rgba(59,130,246,0.1);
+                    border-color: #f0b429;
+                    background: rgba(240, 180, 41, 0.02);
+                    box-shadow: 0 0 0 3px rgba(240, 180, 41, 0.2);
                 }
 
-                .field-error { font-size: 12px; color: #f87171; margin-top: 5px; }
+                .field-error { font-size: 12px; color: #f87171; margin-top: 5px; font-weight: 500; }
 
-                /* Upload Zone */
                 .upload-zone {
-                    border: 2px dashed rgba(255,255,255,0.1);
+                    border: 2px dashed rgba(255,255,255,0.15);
                     border-radius: 16px;
                     padding: 36px 32px;
                     text-align: center;
                     cursor: pointer;
                     transition: all 0.3s;
-                    background: rgba(255,255,255,0.02);
+                    background: rgba(0, 0, 0, 0.2);
                 }
 
                 .upload-zone:hover {
-                    border-color: rgba(59,130,246,0.4);
-                    background: rgba(59,130,246,0.04);
+                    border-color: rgba(240, 180, 41, 0.5);
+                    background: rgba(240, 180, 41, 0.04);
                 }
 
                 .upload-zone.has-file {
-                    border-color: rgba(52,211,153,0.4);
-                    background: rgba(52,211,153,0.04);
+                    border-color: rgba(52,211,153,0.5);
+                    background: rgba(52,211,153,0.03);
                     border-style: solid;
                     cursor: default;
                 }
 
                 .upload-icon {
                     width: 60px; height: 60px;
-                    background: rgba(59,130,246,0.1);
+                    background: rgba(240, 180, 41, 0.12);
                     border-radius: 16px;
                     display: flex;
                     align-items: center;
                     justify-content: center;
                     margin: 0 auto 16px;
+                    border: 1px solid rgba(240, 180, 41, 0.25);
                 }
 
                 .upload-title {
@@ -249,8 +258,8 @@ export default function Apply() {
                     margin-bottom: 6px;
                 }
 
-                .upload-sub { font-size: 13px; color: #475569; line-height: 1.5; }
-                .upload-sub span { color: #60a5fa; font-weight: 600; }
+                .upload-sub { font-size: 13px; color: #94a3b8; line-height: 1.5; }
+                .upload-sub span { color: #f0b429; font-weight: 600; }
 
                 .upload-formats {
                     display: flex;
@@ -262,11 +271,11 @@ export default function Apply() {
 
                 .format-badge {
                     padding: 4px 12px;
-                    background: rgba(255,255,255,0.04);
-                    border: 1px solid rgba(255,255,255,0.08);
+                    background: rgba(255,255,255,0.06);
+                    border: 1px solid rgba(255,255,255,0.15);
                     border-radius: 100px;
-                    font-size: 11px;
-                    color: #64748b;
+                    font-size: 12px;
+                    color: #cbd5e1;
                     font-weight: 600;
                 }
 
@@ -276,15 +285,15 @@ export default function Apply() {
                     width: 90px; height: 60px;
                     border-radius: 10px;
                     object-fit: cover;
-                    border: 1px solid rgba(255,255,255,0.1);
+                    border: 1px solid rgba(255,255,255,0.15);
                     flex-shrink: 0;
                 }
 
                 .file-pdf-icon {
                     width: 90px; height: 60px;
                     border-radius: 10px;
-                    background: rgba(248,113,113,0.1);
-                    border: 1px solid rgba(248,113,113,0.2);
+                    background: rgba(248,113,113,0.15);
+                    border: 1px solid rgba(248,113,113,0.3);
                     display: flex;
                     align-items: center;
                     justify-content: center;
@@ -293,15 +302,15 @@ export default function Apply() {
 
                 .file-info { flex: 1; }
                 .file-name { font-weight: 600; color: white; font-size: 14px; margin-bottom: 5px; word-break: break-all; }
-                .file-status { display: flex; align-items: center; gap: 5px; font-size: 12px; color: #34d399; font-weight: 600; }
+                .file-status { display: flex; align-items: center; gap: 5px; font-size: 13px; color: #34d399; font-weight: 600; }
 
                 .file-remove {
-                    background: rgba(248,113,113,0.08);
-                    border: 1px solid rgba(248,113,113,0.2);
+                    background: rgba(248,113,113,0.1);
+                    border: 1px solid rgba(248,113,113,0.3);
                     border-radius: 8px;
                     padding: 7px 14px;
                     font-size: 12px;
-                    color: #f87171;
+                    color: #fca5a5;
                     cursor: pointer;
                     transition: all 0.2s;
                     display: flex;
@@ -312,12 +321,11 @@ export default function Apply() {
                     flex-shrink: 0;
                 }
 
-                .file-remove:hover { background: rgba(248,113,113,0.15); }
+                .file-remove:hover { background: rgba(248,113,113,0.2); color: #f87171; }
 
-                /* Info Box */
                 .info-box {
-                    background: rgba(59,130,246,0.06);
-                    border: 1px solid rgba(59,130,246,0.15);
+                    background: rgba(240, 180, 41, 0.04);
+                    border: 1px solid rgba(240, 180, 41, 0.25);
                     border-radius: 16px;
                     padding: 20px 24px;
                     margin-bottom: 20px;
@@ -328,7 +336,7 @@ export default function Apply() {
                     font-family: 'Syne', sans-serif;
                     font-size: 14px;
                     font-weight: 700;
-                    color: #60a5fa;
+                    color: #f5c453;
                     margin-bottom: 12px;
                     display: flex;
                     align-items: center;
@@ -342,23 +350,23 @@ export default function Apply() {
                     align-items: flex-start;
                     gap: 10px;
                     font-size: 13px;
-                    color: #64748b;
+                    color: #e2e8f0;
                     line-height: 1.5;
                 }
 
                 .info-dot {
                     width: 6px; height: 6px;
                     border-radius: 50%;
-                    background: #3b82f6;
+                    background: #f0b429;
                     flex-shrink: 0;
-                    margin-top: 5px;
+                    margin-top: 6px;
                 }
 
                 .submit-btn {
                     width: 100%;
                     padding: 14px;
-                    background: linear-gradient(135deg, #3b82f6, #6366f1);
-                    color: white;
+                    background: linear-gradient(135deg, #f0b429, #e0a019);
+                    color: #020617;
                     border: none;
                     border-radius: 12px;
                     font-family: 'Syne', sans-serif;
@@ -366,7 +374,7 @@ export default function Apply() {
                     font-weight: 700;
                     cursor: pointer;
                     transition: all 0.3s;
-                    box-shadow: 0 8px 25px rgba(59,130,246,0.35);
+                    box-shadow: 0 8px 25px rgba(240, 180, 41, 0.25);
                     display: flex;
                     align-items: center;
                     justify-content: center;
@@ -377,15 +385,17 @@ export default function Apply() {
 
                 .submit-btn:hover:not(:disabled) {
                     transform: translateY(-2px);
-                    box-shadow: 0 12px 35px rgba(59,130,246,0.5);
+                    box-shadow: 0 12px 35px rgba(240, 180, 41, 0.35);
+                    filter: brightness(1.1);
                 }
 
                 .submit-btn:disabled {
-                    opacity: 0.5;
+                    opacity: 0.4;
                     cursor: not-allowed;
                     transform: none;
                     box-shadow: none;
-                    background: rgba(59,130,246,0.3);
+                    background: rgba(255, 255, 255, 0.12);
+                    color: #94a3b8;
                 }
 
                 @keyframes fadeUp {
@@ -396,150 +406,148 @@ export default function Apply() {
                 @media (max-width: 640px) { .form-grid-2 { grid-template-columns: 1fr; } }
             `}</style>
 
-            <div className="apply-root">
-                <div className="apply-bg-orb apply-bg-orb-1" />
-                <div className="apply-bg-orb apply-bg-orb-2" />
-                <div className="apply-grid" />
+            <div className="scroll-wrapper">
+                <div className="apply-root">
+                    <div className="apply-bg-orb apply-bg-orb-1" />
+                    <div className="apply-bg-orb apply-bg-orb-2" />
+                    <div className="apply-grid" />
 
-                <div className="apply-content">
-                    <div className="page-header">
-                        <div className="page-title sf-display">Ajukan <span>Modal Usaha.</span></div>
-                        <div className="page-sub">Pinjaman mikro untuk mendukung SDG 8 — Pekerjaan Layak & Pertumbuhan Ekonomi</div>
-                    </div>
-
-                    {/* Info Box */}
-                    <div className="info-box">
-                        <div className="info-box-title">
-                            <AlertCircle size={16} />
-                            Syarat & Ketentuan Pengajuan
+                    <div className="apply-content">
+                        <div className="page-header">
+                            <div className="page-title sf-display">Ajukan <span>Modal Usaha.</span></div>
+                            <div className="page-sub">Pinjaman mikro untuk mendukung SDG 8 — Pekerjaan Layak & Pertumbuhan Ekonomi</div>
                         </div>
-                        <div className="info-list">
-                            <div className="info-item"><div className="info-dot" />Jumlah pinjaman minimum Rp 500.000 dan maksimum Rp 100.000.000</div>
-                            <div className="info-item"><div className="info-dot" />Upload KTP sebagai dokumen jaminan identitas (wajib)</div>
-                            <div className="info-item"><div className="info-dot" />Skor kredit akan dianalisis otomatis oleh sistem AI kami</div>
-                            <div className="info-item"><div className="info-dot" />Hasil analisis dan status persetujuan akan muncul di monitoring dalam 1x24 jam</div>
-                        </div>
-                    </div>
 
-                    <form onSubmit={submit}>
-                        {/* Detail Pinjaman */}
-                        <div className="form-card">
-                            <div className="section-label sf-display">
-                                <div className="section-icon">
-                                    <LayoutDashboard size={18} color="#60a5fa" />
-                                </div>
-                                Detail Pinjaman
+                        <div className="info-box">
+                            <div className="info-box-title">
+                                <AlertCircle size={16} />
+                                Syarat & Ketentuan Pengajuan
                             </div>
-
-                            <div className="form-grid-2">
-                                <div>
-                                    <label className="field-label">Jumlah Pinjaman</label>
-                                    <div className="field-input-wrap">
-                                        <span className="field-prefix">Rp</span>
-                                        <input
-                                            type="text"
-                                            className="field-input"
-                                            placeholder="500.000"
-                                            value={displayAmount}
-                                            onChange={handleAmountChange}
-                                        />
-                                    </div>
-                                    {errors.amount && <div className="field-error">{errors.amount}</div>}
-                                    {data.amount !== '' && Number(data.amount) < 500000 && (
-                                        <div className="field-error">Minimum pinjaman Rp 500.000</div>
-                                    )}
-                                </div>
-
-                                <div>
-                                    <label className="field-label">Tenor (Bulan)</label>
-                                    <div className="field-input-wrap">
-                                        <input
-                                            type="text"
-                                            className="field-input no-prefix"
-                                            placeholder="Contoh: 12"
-                                            value={data.tenor}
-                                            onChange={(e) => {
-                                                const raw = e.target.value.replace(/\D/g, '');
-                                                setData("tenor", raw);
-                                            }}
-                                        />
-                                    </div>
-                                    {errors.tenor && <div className="field-error">{errors.tenor}</div>}
-                                </div>
+                            <div className="info-list">
+                                <div className="info-item"><div className="info-dot" />Jumlah pinjaman minimum Rp 500.000 dan maksimum Rp 100.000.000</div>
+                                <div className="info-item"><div className="info-dot" />Upload KTP sebagai dokumen jaminan identitas (wajib)</div>
+                                <div className="info-item"><div className="info-dot" />Skor kredit akan dianalisis otomatis oleh sistem AI kami</div>
+                                <div className="info-item"><div className="info-dot" />Hasil analisis dan status persetujuan akan muncul di monitoring dalam 1x24 jam</div>
                             </div>
                         </div>
 
-                        {/* Upload KTP */}
-                        <div className="form-card">
-                            <div className="section-label sf-display">
-                                <div className="section-icon">
-                                    <FileText size={18} color="#60a5fa" />
+                        <form onSubmit={submit}>
+                            <div className="form-card">
+                                <div className="section-label sf-display">
+                                    <div className="section-icon">
+                                        <LayoutDashboard size={18} color="#f0b429" />
+                                    </div>
+                                    Detail Pinjaman
                                 </div>
-                                Upload Dokumen KTP
-                                <span style={{ fontSize: '11px', color: '#f87171', fontWeight: 600 }}>* Wajib</span>
-                            </div>
 
-                            <input
-                                type="file"
-                                ref={fileInputRef}
-                                accept=".jpg,.jpeg,.png,.pdf"
-                                style={{ display: 'none' }}
-                                onChange={handleFileChange}
-                            />
-
-                            {!ktpName ? (
-                                <div className="upload-zone" onClick={() => fileInputRef.current?.click()}>
-                                    <div className="upload-icon">
-                                        <Upload size={26} color="#60a5fa" />
-                                    </div>
-                                    <div className="upload-title">Klik untuk upload KTP Anda</div>
-                                    <div className="upload-sub">
-                                        atau <span>drag & drop</span> file ke sini
-                                    </div>
-                                    <div className="upload-formats">
-                                        <span className="format-badge">JPG</span>
-                                        <span className="format-badge">PNG</span>
-                                        <span className="format-badge">PDF</span>
-                                        <span className="format-badge">Max 2MB</span>
-                                    </div>
-                                </div>
-                            ) : (
-                                <div className="upload-zone has-file">
-                                    <div className="file-preview">
-                                        {ktpPreview ? (
-                                            <img src={ktpPreview} className="file-thumb" alt="Preview KTP" />
-                                        ) : (
-                                            <div className="file-pdf-icon">
-                                                <FileText size={28} color="#f87171" />
-                                            </div>
-                                        )}
-                                        <div className="file-info">
-                                            <div className="file-name">{ktpName}</div>
-                                            <div className="file-status">
-                                                <CheckCircle size={13} />
-                                                File siap diupload
-                                            </div>
+                                <div className="form-grid-2">
+                                    <div>
+                                        <label className="field-label">Jumlah Pinjaman</label>
+                                        <div className="field-input-wrap">
+                                            <span className="field-prefix">Rp</span>
+                                            <input
+                                                type="text"
+                                                className="field-input"
+                                                placeholder="500.000"
+                                                value={displayAmount}
+                                                onChange={handleAmountChange}
+                                            />
                                         </div>
-                                        <button type="button" className="file-remove" onClick={removeFile}>
-                                            <X size={13} /> Hapus
-                                        </button>
+                                        {errors.amount && <div className="field-error">{errors.amount}</div>}
+                                        {data.amount !== '' && Number(data.amount) < 500000 && (
+                                            <div className="field-error">Minimum pinjaman Rp 500.000</div>
+                                        )}
+                                    </div>
+
+                                    <div>
+                                        <label className="field-label">Tenor (Bulan)</label>
+                                        <div className="field-input-wrap">
+                                            <input
+                                                type="text"
+                                                className="field-input no-prefix"
+                                                placeholder="Contoh: 12"
+                                                value={data.tenor}
+                                                onChange={(e) => {
+                                                    const raw = e.target.value.replace(/\D/g, '');
+                                                    setData("tenor", raw);
+                                                }}
+                                            />
+                                        </div>
+                                        {errors.tenor && <div className="field-error">{errors.tenor}</div>}
                                     </div>
                                 </div>
-                            )}
-                        </div>
+                            </div>
 
-                        {/* Submit Button */}
-                        <button type="submit" className="submit-btn" disabled={processing || !isFormValid}>
-                            {processing
-                                ? "⏳ Menganalisis & Mengunggah..."
-                                : !isKtpUploaded
-                                ? "📎 Upload KTP Terlebih Dahulu"
-                                : !isAmountValid
-                                ? "💰 Masukkan Jumlah Pinjaman (Min. Rp 500.000)"
-                                : "🚀 Ajukan Pinjaman Sekarang"
-                            }
-                        </button>
-                    </form>
+                            <div className="form-card">
+                                <div className="section-label sf-display">
+                                    <div className="section-icon">
+                                        <FileText size={18} color="#f0b429" />
+                                    </div>
+                                    Upload Dokumen KTP
+                                    <span style={{ fontSize: '12px', color: '#f87171', fontWeight: 600, marginLeft: '4px' }}>* Wajib</span>
+                                </div>
+
+                                <input
+                                    type="file"
+                                    ref={fileInputRef}
+                                    accept=".jpg,.jpeg,.png,.pdf"
+                                    style={{ display: 'none' }}
+                                    onChange={handleFileChange}
+                                />
+
+                                {!ktpName ? (
+                                    <div className="upload-zone" onClick={() => fileInputRef.current?.click()}>
+                                        <div className="upload-icon">
+                                            <Upload size={26} color="#f0b429" />
+                                        </div>
+                                        <div className="upload-title">Klik untuk upload KTP Anda</div>
+                                        <div className="upload-sub">
+                                            atau <span>drag & drop</span> file ke sini
+                                        </div>
+                                        <div className="upload-formats">
+                                            <span className="format-badge">JPG</span>
+                                            <span className="format-badge">PNG</span>
+                                            <span className="format-badge">PDF</span>
+                                            <span className="format-badge">Max 2MB</span>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className="upload-zone has-file">
+                                        <div className="file-preview">
+                                            {ktpPreview ? (
+                                                <img src={ktpPreview} className="file-thumb" alt="Preview KTP" />
+                                            ) : (
+                                                <div className="file-pdf-icon">
+                                                    <FileText size={28} color="#f87171" />
+                                                </div>
+                                            )}
+                                            <div className="file-info">
+                                                <div className="file-name">{ktpName}</div>
+                                                <div className="file-status">
+                                                    <CheckCircle size={13} />
+                                                    File siap diupload
+                                                </div>
+                                            </div>
+                                            <button type="button" className="file-remove" onClick={removeFile}>
+                                                <X size={13} /> Hapus
+                                            </button>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+
+                            <button type="submit" className="submit-btn" disabled={processing || !isFormValid}>
+                                {processing
+                                    ? "⏳ Menganalisis & Mengunggah..."
+                                    : !isKtpUploaded
+                                    ? "📎 Upload KTP Terlebih Dahulu"
+                                    : !isAmountValid
+                                    ? "💰 Masukkan Jumlah Pinjaman (Min. Rp 500.000)"
+                                    : "🚀 Ajukan Pinjaman Sekarang"
+                                }
+                            </button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </AuthenticatedLayout>
